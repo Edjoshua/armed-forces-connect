@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "./pages/Landing";
 import DashboardLayout from "./components/DashboardLayout";
-import DashboardOverview from "./pages/DashboardOverview";
 import PersonnelDashboard from "./pages/PersonnelDashboard";
 import RetailDashboard from "./pages/RetailDashboard";
 import SupplyDashboard from "./pages/SupplyDashboard";
