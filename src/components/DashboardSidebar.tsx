@@ -14,8 +14,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Overview", icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Personnel", icon: Users, path: "/dashboard/personnel" },
+  { label: "Personnel", icon: Users, path: "/dashboard" },
   { label: "Retail Discounts", icon: ShoppingBag, path: "/dashboard/retail" },
   { label: "Supply Chain", icon: Truck, path: "/dashboard/supply" },
   { label: "Education Fund", icon: GraduationCap, path: "/dashboard/education" },

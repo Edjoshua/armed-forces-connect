@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "./pages/Landing";
 import DashboardLayout from "./components/DashboardLayout";
-import DashboardOverview from "./pages/DashboardOverview";
 import PersonnelDashboard from "./pages/PersonnelDashboard";
 import RetailDashboard from "./pages/RetailDashboard";
 import SupplyDashboard from "./pages/SupplyDashboard";
@@ -25,7 +24,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/dashboard" element={<DashboardLayout />}>
-            <Route index element={<DashboardOverview />} />
+            <Route index element={<PersonnelDashboard />} />
             <Route path="personnel" element={<PersonnelDashboard />} />
             <Route path="retail" element={<RetailDashboard />} />
             <Route path="supply" element={<SupplyDashboard />} />
