@@ -5,17 +5,54 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/dashboard");
+    setLoading(true);
+
+    try {
+      if (activeTab === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: name },
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (error) throw error;
+        toast({
+          title: "Account created",
+          description: "Check your email to verify your account, or sign in if auto-confirm is enabled.",
+        });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,6 +101,7 @@ const Landing = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="rounded-lg border-border"
+                  required
                 />
               </div>
             )}
@@ -76,6 +114,7 @@ const Landing = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="rounded-lg border-border"
+                required
               />
             </div>
 
@@ -87,6 +126,8 @@ const Landing = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="rounded-lg border-border"
+                minLength={6}
+                required
               />
             </div>
 
@@ -94,8 +135,9 @@ const Landing = () => {
               type="submit"
               variant="gold"
               className="w-full rounded-xl h-12 text-base"
+              disabled={loading}
             >
-              {activeTab === "login" ? "Sign in" : "Create account"}
+              {loading ? "Please wait..." : activeTab === "login" ? "Sign in" : "Create account"}
             </Button>
           </form>
         </CardContent>
