@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Shield, LayoutDashboard, ShoppingBag, Truck, GraduationCap,
   ClipboardCheck, Users, Settings, LogOut, ChevronLeft, ChevronRight
@@ -26,6 +27,7 @@ const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut } = useAuth();
 
   return (
     <aside className={cn(
@@ -60,7 +62,7 @@ const DashboardSidebar = () => {
 
       <div className="border-t border-border/50 p-2 space-y-1">
         <button
-          onClick={() => navigate("/")}
+          onClick={async () => { await signOut(); navigate("/"); }}
           className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
         >
           <LogOut className="h-4 w-4 shrink-0" />
