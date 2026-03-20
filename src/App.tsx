@@ -12,6 +12,7 @@ import SupplyDashboard from "./pages/SupplyDashboard";
 import EducationDashboard from "./pages/EducationDashboard";
 import AuditDashboard from "./pages/AuditDashboard";
 import SettingsDashboard from "./pages/SettingsDashboard";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
