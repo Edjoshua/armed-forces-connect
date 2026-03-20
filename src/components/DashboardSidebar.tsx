@@ -27,6 +27,7 @@ const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut } = useAuth();
 
   return (
     <aside className={cn(
