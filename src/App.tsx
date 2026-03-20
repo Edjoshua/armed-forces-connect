@@ -12,6 +12,7 @@ import SupplyDashboard from "./pages/SupplyDashboard";
 import EducationDashboard from "./pages/EducationDashboard";
 import AuditDashboard from "./pages/AuditDashboard";
 import SettingsDashboard from "./pages/SettingsDashboard";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route index element={<PersonnelDashboard />} />
               <Route path="personnel" element={<PersonnelDashboard />} />

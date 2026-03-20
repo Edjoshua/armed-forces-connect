@@ -131,6 +131,16 @@ const Landing = () => {
               />
             </div>
 
+            {activeTab === "login" && (
+              <button
+                type="button"
+                onClick={() => navigate("/reset-password")}
+                className="text-xs text-primary hover:underline self-end -mt-2"
+              >
+                Forgot password?
+              </button>
+            )}
+
             <Button
               type="submit"
               variant="gold"
