@@ -19,8 +19,8 @@ const severityStyle: Record<string, string> = {
 };
 
 const AuditDashboard = () => (
-  <div className="space-y-6 p-6">
-    <div className="flex items-center justify-between">
+  <div className="space-y-6 p-4 pt-14 md:p-6 md:pt-6">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Audit & Compliance</h1>
         <p className="text-sm text-muted-foreground">Independent monitoring — read-only access</p>
@@ -31,7 +31,7 @@ const AuditDashboard = () => (
       </div>
     </div>
 
-    <div className="grid gap-4 sm:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <StatsCard icon={AlertTriangle} title="Active Flags" value="14" change="5 critical" changeType="negative" />
       <StatsCard icon={ClipboardCheck} title="Compliance Score" value="94.2%" change="+1.3% this month" changeType="positive" />
       <StatsCard icon={Eye} title="Audit Trail Entries" value="2.4M" change="Immutable log" changeType="neutral" />

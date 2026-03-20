@@ -17,13 +17,13 @@ const statusStyle: Record<string, string> = {
 };
 
 const SupplyDashboard = () => (
-  <div className="space-y-6 p-6">
+  <div className="space-y-6 p-4 pt-14 md:p-6 md:pt-6">
     <div>
       <h1 className="text-2xl font-bold text-foreground">Supply Chain Operations</h1>
       <p className="text-sm text-muted-foreground">Battlefield essential goods tracking and logistics</p>
     </div>
 
-    <div className="grid gap-4 sm:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <StatsCard icon={Truck} title="Active Shipments" value="342" change="12 dispatched today" changeType="neutral" />
       <StatsCard icon={Package} title="Items in Transit" value="18,490" change="98.2% on-time" changeType="positive" />
       <StatsCard icon={MapPin} title="Supply Depots" value="24" change="All operational" changeType="positive" />

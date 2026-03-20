@@ -11,13 +11,13 @@ const transactions = [
 ];
 
 const RetailDashboard = () => (
-  <div className="space-y-6 p-6">
+  <div className="space-y-6 p-4 pt-14 md:p-6 md:pt-6">
     <div>
       <h1 className="text-2xl font-bold text-foreground">Retail Discount Program</h1>
       <p className="text-sm text-muted-foreground">Transaction monitoring and partner management</p>
     </div>
 
-    <div className="grid gap-4 sm:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <StatsCard icon={ShoppingBag} title="Total Transactions" value="284,910" change="+4,210 this week" changeType="positive" />
       <StatsCard icon={TrendingUp} title="Savings Generated" value="₦2.4B" change="+18% QoQ" changeType="positive" />
       <StatsCard icon={Store} title="Active Partners" value="1,247" change="+23 this month" changeType="positive" />
