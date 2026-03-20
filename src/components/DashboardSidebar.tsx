@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Shield, LayoutDashboard, ShoppingBag, Truck, GraduationCap,
   ClipboardCheck, Users, Settings, LogOut, ChevronLeft, ChevronRight
