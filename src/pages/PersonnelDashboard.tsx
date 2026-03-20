@@ -34,12 +34,12 @@ const PersonnelDashboard = () => (
 
     <Card className="border-border/50 bg-card/80">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="text-base">Personnel Registry</CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-              <Input placeholder="Search by MWIC or name..." className="h-9 w-64 pl-8 text-xs bg-secondary/50 border-border/50" />
+              <Input placeholder="Search by MWIC or name..." className="h-9 w-full sm:w-64 pl-8 text-xs bg-secondary/50 border-border/50" />
             </div>
             <Button variant="gold-outline" size="sm"><Filter className="h-3.5 w-3.5" /> Filter</Button>
           </div>

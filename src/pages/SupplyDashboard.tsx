@@ -23,7 +23,7 @@ const SupplyDashboard = () => (
       <p className="text-sm text-muted-foreground">Battlefield essential goods tracking and logistics</p>
     </div>
 
-    <div className="grid gap-4 sm:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <StatsCard icon={Truck} title="Active Shipments" value="342" change="12 dispatched today" changeType="neutral" />
       <StatsCard icon={Package} title="Items in Transit" value="18,490" change="98.2% on-time" changeType="positive" />
       <StatsCard icon={MapPin} title="Supply Depots" value="24" change="All operational" changeType="positive" />

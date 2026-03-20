@@ -24,7 +24,7 @@ const EducationDashboard = () => (
       <p className="text-sm text-muted-foreground">Education savings and scholarship management</p>
     </div>
 
-    <div className="grid gap-4 sm:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <StatsCard icon={Wallet} title="Total Fund Value" value="₦890M" change="+₦45M this month" changeType="positive" />
       <StatsCard icon={Users} title="Beneficiaries" value="198,450" change="Active dependents" changeType="neutral" />
       <StatsCard icon={GraduationCap} title="Scholarships" value="4,210" change="Awarded this year" changeType="positive" />

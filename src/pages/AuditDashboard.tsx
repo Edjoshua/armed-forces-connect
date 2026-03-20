@@ -31,7 +31,7 @@ const AuditDashboard = () => (
       </div>
     </div>
 
-    <div className="grid gap-4 sm:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <StatsCard icon={AlertTriangle} title="Active Flags" value="14" change="5 critical" changeType="negative" />
       <StatsCard icon={ClipboardCheck} title="Compliance Score" value="94.2%" change="+1.3% this month" changeType="positive" />
       <StatsCard icon={Eye} title="Audit Trail Entries" value="2.4M" change="Immutable log" changeType="neutral" />
