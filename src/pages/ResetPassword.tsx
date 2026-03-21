@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import militaryCrest from "@/assets/nigerian-military-crest.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,7 +76,7 @@ const ResetPassword = () => {
       <Card className="w-full max-w-md shadow-xl border-border/50 rounded-2xl overflow-hidden">
         <CardContent className="p-6 space-y-5">
           <div className="flex items-center justify-center gap-2">
-            <Shield className="h-5 w-5 text-primary" />
+            <img src={militaryCrest} alt="Nigerian Military Crest" className="h-8 w-8 object-contain" />
             <h2 className="text-xl font-bold text-foreground">
               {mode === "update" ? "Set New Password" : "Reset Password"}
             </h2>
