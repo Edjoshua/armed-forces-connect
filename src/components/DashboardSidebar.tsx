@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Shield, ShoppingBag, Truck, GraduationCap,
+  ShoppingBag, Truck, GraduationCap,
   ClipboardCheck, Users, Settings, LogOut, ChevronLeft, ChevronRight, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import militaryCrest from "@/assets/nigerian-military-crest.png";
 
 interface NavItem {
   label: string;
