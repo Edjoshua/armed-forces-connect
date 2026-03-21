@@ -86,7 +86,7 @@ const Landing = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 pt-8 space-y-5">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Shield className="h-5 w-5 text-primary" />
+              <img src={militaryCrest} alt="Nigerian Military Crest" className="h-8 w-8 object-contain" />
               <h2 className="text-xl font-bold text-foreground">
                 {activeTab === "login" ? "Log in" : "Sign up"}
               </h2>
