@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Shield, ShoppingBag, Truck, GraduationCap,
+  ShoppingBag, Truck, GraduationCap,
   ClipboardCheck, Users, Settings, LogOut, ChevronLeft, ChevronRight, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import militaryCrest from "@/assets/nigerian-military-crest.png";
 
 interface NavItem {
   label: string;
@@ -48,9 +49,9 @@ const DashboardSidebar = () => {
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="flex items-center gap-2.5 border-b border-border/50 p-4">
-        <Shield className="h-7 w-7 shrink-0 text-primary" />
-        {!collapsed && <span className="text-sm font-bold tracking-wide text-foreground">MWCIP</span>}
+      <div className="flex items-center gap-2.5 border-b border-sidebar-border p-4">
+        <img src={militaryCrest} alt="Nigerian Military Crest" className="h-8 w-8 shrink-0 object-contain" />
+        {!collapsed && <span className="text-sm font-bold tracking-wide text-sidebar-foreground">MWCIP</span>}
         {/* Mobile close */}
         <button onClick={() => setMobileOpen(false)} className="ml-auto md:hidden">
           <X className="h-5 w-5 text-muted-foreground" />
