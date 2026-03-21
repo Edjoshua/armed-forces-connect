@@ -83,21 +83,21 @@
 
 @layer utilities {
   .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(152 60% 36%), hsl(160 50% 45%));
+    background: linear-gradient(135deg, hsl(140 50% 24%), hsl(48 70% 48%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .border-gold {
-    border-color: hsl(152 60% 36% / 0.3);
+    border-color: hsl(48 70% 48% / 0.4);
   }
 
   .bg-gold-subtle {
-    background-color: hsl(152 60% 36% / 0.08);
+    background-color: hsl(140 50% 24% / 0.08);
   }
 
   .glow-gold {
-    box-shadow: 0 0 30px hsl(152 60% 36% / 0.15);
+    box-shadow: 0 0 30px hsl(140 50% 24% / 0.15);
   }
 }
