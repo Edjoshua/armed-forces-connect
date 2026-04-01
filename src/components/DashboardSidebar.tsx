@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  ShoppingBag, Truck, GraduationCap,
-  ClipboardCheck, Users, Settings, LogOut, ChevronLeft, ChevronRight, Menu, X
+  Wallet, CreditCard, ShoppingBag, Truck, GraduationCap,
+  ClipboardCheck, Settings, LogOut, ChevronLeft, ChevronRight, Menu, X, HeadphonesIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,16 +12,18 @@ import militaryCrest from "@/assets/nigerian-military-crest.png";
 
 interface NavItem {
   label: string;
-  icon: typeof Users;
+  icon: typeof Wallet;
   path: string;
 }
 
 const navItems: NavItem[] = [
-  { label: "Personnel", icon: Users, path: "/dashboard" },
+  { label: "Wallet", icon: Wallet, path: "/dashboard" },
+  { label: "Payments", icon: CreditCard, path: "/dashboard/payments" },
   { label: "Retail Discounts", icon: ShoppingBag, path: "/dashboard/retail" },
   { label: "Supply Chain", icon: Truck, path: "/dashboard/supply" },
   { label: "Education Fund", icon: GraduationCap, path: "/dashboard/education" },
   { label: "Audit & Compliance", icon: ClipboardCheck, path: "/dashboard/audit" },
+  { label: "Support", icon: HeadphonesIcon, path: "/dashboard/support" },
   { label: "Settings", icon: Settings, path: "/dashboard/settings" },
 ];
 
@@ -52,7 +54,6 @@ const DashboardSidebar = () => {
       <div className="flex items-center gap-2.5 border-b border-sidebar-border p-4">
         <img src={militaryCrest} alt="Nigerian Military Crest" className="h-8 w-8 shrink-0 object-contain" />
         {!collapsed && <span className="text-sm font-bold tracking-wide text-sidebar-foreground">MWCIP</span>}
-        {/* Mobile close */}
         <button onClick={() => setMobileOpen(false)} className="ml-auto md:hidden">
           <X className="h-5 w-5 text-muted-foreground" />
         </button>
@@ -73,8 +74,8 @@ const DashboardSidebar = () => {
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-foreground">{userName}</p>
-              <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
+              <p className="truncate text-sm font-medium text-sidebar-foreground">{userName}</p>
+              <p className="truncate text-xs text-sidebar-foreground/60">{userEmail}</p>
             </div>
           </div>
         )}
@@ -91,8 +92,8 @@ const DashboardSidebar = () => {
               className={cn(
                 "flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
               )}
             >
               <item.icon className="h-4 w-4 shrink-0" />
@@ -106,7 +107,7 @@ const DashboardSidebar = () => {
       <div className="border-t border-border/50 p-2 space-y-1">
         <button
           onClick={async () => { await signOut(); navigate("/"); }}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           {!collapsed && <span>Sign Out</span>}
@@ -114,7 +115,7 @@ const DashboardSidebar = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="w-full hidden md:inline-flex"
+          className="w-full hidden md:inline-flex text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
           onClick={() => setCollapsed(!collapsed)}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -125,7 +126,6 @@ const DashboardSidebar = () => {
 
   return (
     <>
-      {/* Mobile hamburger */}
       <button
         onClick={() => setMobileOpen(true)}
         className="fixed top-3 left-3 z-50 rounded-md bg-card p-2 shadow-md border border-border/50 md:hidden"
@@ -133,15 +133,10 @@ const DashboardSidebar = () => {
         <Menu className="h-5 w-5 text-foreground" />
       </button>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40 md:hidden"
-          onClick={() => setMobileOpen(false)}
-        />
+        <div className="fixed inset-0 z-40 bg-black/40 md:hidden" onClick={() => setMobileOpen(false)} />
       )}
 
-      {/* Mobile sidebar */}
       <aside className={cn(
         "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar border-r border-border/50 transition-transform duration-300 md:hidden",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
@@ -149,7 +144,6 @@ const DashboardSidebar = () => {
         {sidebarContent}
       </aside>
 
-      {/* Desktop sidebar */}
       <aside className={cn(
         "hidden md:flex h-screen flex-col border-r border-border/50 bg-sidebar transition-all duration-300",
         collapsed ? "w-16" : "w-60"

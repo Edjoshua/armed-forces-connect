@@ -6,12 +6,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Landing from "./pages/Landing";
 import DashboardLayout from "./components/DashboardLayout";
-import PersonnelDashboard from "./pages/PersonnelDashboard";
+import WalletDashboard from "./pages/WalletDashboard";
+import PaymentsDashboard from "./pages/PaymentsDashboard";
 import RetailDashboard from "./pages/RetailDashboard";
 import SupplyDashboard from "./pages/SupplyDashboard";
 import EducationDashboard from "./pages/EducationDashboard";
 import AuditDashboard from "./pages/AuditDashboard";
 import SettingsDashboard from "./pages/SettingsDashboard";
+import SupportDashboard from "./pages/SupportDashboard";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -42,13 +44,14 @@ const App = () => (
             <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-              <Route index element={<PersonnelDashboard />} />
-              <Route path="personnel" element={<PersonnelDashboard />} />
+              <Route index element={<WalletDashboard />} />
+              <Route path="payments" element={<PaymentsDashboard />} />
               <Route path="retail" element={<RetailDashboard />} />
               <Route path="supply" element={<SupplyDashboard />} />
               <Route path="education" element={<EducationDashboard />} />
               <Route path="audit" element={<AuditDashboard />} />
               <Route path="settings" element={<SettingsDashboard />} />
+              <Route path="support" element={<SupportDashboard />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
