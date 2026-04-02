@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { QrCode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Camera } from "lucide-react";
+import { QrCode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Camera, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 const savedMerchants = [
-  { name: "ShopRite Abuja", category: "Retail", icon: Store },
-  { name: "MedPlus Pharmacy", category: "Health", icon: Building2 },
-  { name: "SPAR Kaduna", category: "Retail", icon: Store },
-  { name: "Total Energies", category: "Fuel", icon: Building2 },
+  { name: "ShopRite Abuja", category: "Retail", icon: Store, discount: "15%" },
+  { name: "MedPlus Pharmacy", category: "Health", icon: Building2, discount: "20%" },
+  { name: "SPAR Kaduna", category: "Retail", icon: Store, discount: "10%" },
+  { name: "Total Energies", category: "Fuel", icon: Building2, discount: "8%" },
 ];
 
 const PaymentsDashboard = () => {
@@ -20,6 +20,7 @@ const PaymentsDashboard = () => {
   const [recipientAccount, setRecipientAccount] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [merchantAmount, setMerchantAmount] = useState("");
+  const [qrAmount, setQrAmount] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const { toast } = useToast();
 
@@ -47,8 +48,27 @@ const PaymentsDashboard = () => {
     setMerchantAmount("");
   };
 
+  const handleQrPay = (discount?: string) => {
+    if (!qrAmount) {
+      toast({ title: "Enter amount", description: "Please enter the payment amount", variant: "destructive" });
+      return;
+    }
+    const amount = Number(qrAmount);
+    if (discount) {
+      const discountPct = parseInt(discount) / 100;
+      const discounted = amount - amount * discountPct;
+      toast({
+        title: "QR Payment with Discount!",
+        description: `Original: ₦${amount.toLocaleString()} → Discounted: ₦${discounted.toLocaleString()} (${discount} off)`,
+      });
+    } else {
+      toast({ title: "QR Payment Successful", description: `₦${amount.toLocaleString()} paid via QR code` });
+    }
+    setQrAmount("");
+  };
+
   return (
-    <div className="space-y-6 p-4 pt-14 md:p-6 md:pt-6">
+    <div className="space-y-6 p-4 md:p-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Payments</h1>
         <p className="text-sm text-muted-foreground">Send money, scan to pay, or tap to pay with NFC</p>
@@ -62,21 +82,45 @@ const PaymentsDashboard = () => {
           <TabsTrigger value="merchant" className="text-xs"><Store className="h-3.5 w-3.5 mr-1" /> Merchant</TabsTrigger>
         </TabsList>
 
-        {/* QR Scan Tab */}
+        {/* QR Scan Tab with Discount */}
         <TabsContent value="scan">
           <Card className="border-border/50 bg-card/80">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2"><QrCode className="h-5 w-5 text-primary" /> Scan QR Code to Pay</CardTitle>
-              <CardDescription>Point your camera at a merchant's QR code to make a payment</CardDescription>
+              <CardDescription>Scan a merchant's QR code — military discounts are applied automatically</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-6">
               <div className="w-64 h-64 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 flex flex-col items-center justify-center gap-3">
                 <Camera className="h-12 w-12 text-primary/40" />
                 <p className="text-sm text-muted-foreground text-center px-4">Camera preview will appear here</p>
               </div>
-              <Button variant="gold" className="w-full max-w-xs" onClick={() => toast({ title: "Scanner Active", description: "QR scanner demo — point at a merchant QR code" })}>
-                <Camera className="h-4 w-4" /> Open Scanner
-              </Button>
+
+              <div className="w-full max-w-xs space-y-3">
+                <Label className="text-xs">Payment Amount (₦)</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  value={qrAmount}
+                  onChange={(e) => setQrAmount(e.target.value)}
+                  className="text-center text-lg font-mono bg-secondary/50 border-border/50"
+                />
+              </div>
+
+              <div className="flex gap-2 w-full max-w-xs">
+                <Button variant="gold" className="flex-1" onClick={() => handleQrPay("15%")}>
+                  <Tag className="h-4 w-4" /> Pay with 15% off
+                </Button>
+                <Button variant="gold-outline" className="flex-1" onClick={() => handleQrPay()}>
+                  Pay Full
+                </Button>
+              </div>
+
+              <div className="w-full max-w-xs rounded-lg bg-success/5 border border-success/20 p-3">
+                <p className="text-xs text-success font-medium flex items-center gap-1">
+                  <Tag className="h-3 w-3" /> Military personnel get automatic discounts at partner merchants when paying via QR code
+                </p>
+              </div>
+
               <div className="w-full max-w-xs space-y-3">
                 <Label className="text-xs text-muted-foreground">Or enter QR code manually</Label>
                 <div className="flex gap-2">
@@ -180,7 +224,10 @@ const PaymentsDashboard = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-foreground truncate">{m.name}</p>
-                      <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{m.category}</Badge>
+                      <div className="flex items-center gap-1">
+                        <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{m.category}</Badge>
+                        <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/20">{m.discount} off</Badge>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

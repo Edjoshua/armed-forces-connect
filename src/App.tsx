@@ -14,6 +14,8 @@ import EducationDashboard from "./pages/EducationDashboard";
 import AuditDashboard from "./pages/AuditDashboard";
 import SettingsDashboard from "./pages/SettingsDashboard";
 import SupportDashboard from "./pages/SupportDashboard";
+import ProfilePage from "./pages/ProfilePage";
+import TransactionHistory from "./pages/TransactionHistory";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +54,8 @@ const App = () => (
               <Route path="audit" element={<AuditDashboard />} />
               <Route path="settings" element={<SettingsDashboard />} />
               <Route path="support" element={<SupportDashboard />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="transactions" element={<TransactionHistory />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
