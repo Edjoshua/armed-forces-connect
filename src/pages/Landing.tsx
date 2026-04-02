@@ -15,6 +15,8 @@ const Landing = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [militaryId, setMilitaryId] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,11 +25,16 @@ const Landing = () => {
 
     try {
       if (activeTab === "signup") {
+        if (!militaryId.trim()) {
+          toast({ title: "Error", description: "Military ID is required", variant: "destructive" });
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { full_name: name },
+            data: { full_name: name, military_id: militaryId, date_of_birth: dateOfBirth },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -84,7 +91,7 @@ const Landing = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 pt-8 space-y-5">
+          <form onSubmit={handleSubmit} className="p-6 pt-8 space-y-4">
             <div className="flex items-center justify-center gap-2 mb-2">
               <img src={militaryCrest} alt="Nigerian Military Crest" className="h-8 w-8 object-contain" />
               <h2 className="text-xl font-bold text-foreground">
@@ -93,17 +100,42 @@ const Landing = () => {
             </div>
 
             {activeTab === "signup" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-muted-foreground text-xs">Full name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="rounded-lg border-border"
-                  required
-                />
-              </div>
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-muted-foreground text-xs">Full name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="rounded-lg border-border"
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="militaryId" className="text-muted-foreground text-xs">Military ID (MWIC)</Label>
+                  <Input
+                    id="militaryId"
+                    type="text"
+                    value={militaryId}
+                    onChange={(e) => setMilitaryId(e.target.value)}
+                    placeholder="e.g. NA/12345/6789"
+                    className="rounded-lg border-border"
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="dob" className="text-muted-foreground text-xs">Date of Birth</Label>
+                  <Input
+                    id="dob"
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    className="rounded-lg border-border"
+                    required
+                  />
+                </div>
+              </>
             )}
 
             <div className="space-y-1.5">

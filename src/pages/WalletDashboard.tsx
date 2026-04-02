@@ -1,11 +1,12 @@
-import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, TrendingUp, Eye, EyeOff, QrCode, Smartphone, Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, TrendingUp, Eye, EyeOff, QrCode, Smartphone, Send, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import StatsCard from "@/components/StatsCard";
-import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const recentTransactions = [
   { id: "TXN-8821", type: "credit", description: "Salary Credit", amount: "+₦450,000", date: "Mar 31, 2026", status: "Completed" },
@@ -17,16 +18,42 @@ const recentTransactions = [
 
 const WalletDashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
+  const [serviceStatus, setServiceStatus] = useState("active");
   const { user } = useAuth();
   const navigate = useNavigate();
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
 
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("service_status")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.service_status) setServiceStatus(data.service_status);
+      });
+  }, [user]);
+
   return (
-    <div className="space-y-6 p-4 pt-14 md:p-6 md:pt-6">
+    <div className="space-y-6 p-4 md:p-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Welcome back, {userName}</h1>
         <p className="text-sm text-muted-foreground">Your wallet overview and recent activity</p>
       </div>
+
+      {/* Monthly Reminder for active service */}
+      {serviceStatus === "active" && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="p-3 flex items-center gap-3">
+            <Shield className="h-5 w-5 text-primary shrink-0" />
+            <div className="flex-1">
+              <p className="text-xs font-medium text-foreground">Monthly ₦10,000 Welfare Fund contribution due on the 1st</p>
+            </div>
+            <Button variant="gold" size="sm" className="text-xs shrink-0">Pay Now</Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Balance Card */}
       <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-card to-accent/5">
@@ -45,7 +72,6 @@ const WalletDashboard = () => {
           </p>
           <p className="text-xs text-success font-medium">+₦485,000 this month</p>
 
-          {/* Quick Actions */}
           <div className="flex gap-3 mt-6">
             <Button variant="gold" size="sm" className="flex-1" onClick={() => navigate("/dashboard/payments")}>
               <Send className="h-4 w-4" /> Send Money
@@ -72,7 +98,7 @@ const WalletDashboard = () => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">Recent Transactions</CardTitle>
-            <Button variant="ghost" size="sm" className="text-xs text-primary">View All</Button>
+            <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={() => navigate("/dashboard/transactions")}>View All</Button>
           </div>
         </CardHeader>
         <CardContent>
