@@ -36,7 +36,7 @@ const WalletDashboard = () => {
   }, [user]);
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 md:p-6 w-full max-w-4xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Welcome back, {userName}</h1>
         <p className="text-sm text-muted-foreground">Your wallet overview and recent activity</p>
