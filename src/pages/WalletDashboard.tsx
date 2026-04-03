@@ -43,6 +43,7 @@ const PULL_THRESHOLD = 80;
 const WalletDashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
   const [serviceStatus, setServiceStatus] = useState("active");
+  const [transactions, setTransactions] = useState(initialTransactions);
   const [refreshing, setRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
