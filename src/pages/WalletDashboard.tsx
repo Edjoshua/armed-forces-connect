@@ -67,7 +67,7 @@ const WalletDashboard = () => {
               {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          <p className="text-4xl font-bold text-foreground mb-1">
+          <p className="text-2xl sm:text-4xl font-bold text-foreground mb-1">
             {showBalance ? "₦1,842,300.00" : "₦••••••••"}
           </p>
           <p className="text-xs text-success font-medium">+₦485,000 this month</p>
