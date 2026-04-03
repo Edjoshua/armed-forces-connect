@@ -57,7 +57,7 @@ const WalletDashboard = () => {
 
       {/* Balance Card */}
       <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-card to-accent/5">
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-primary" />
