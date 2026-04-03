@@ -36,10 +36,10 @@ const WalletDashboard = () => {
   }, [user]);
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 md:p-6 w-full max-w-4xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Welcome back, {userName}</h1>
-        <p className="text-sm text-muted-foreground">Your wallet overview and recent activity</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Welcome back, {userName}</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">Your wallet overview and recent activity</p>
       </div>
 
       {/* Monthly Reminder for active service */}
@@ -57,7 +57,7 @@ const WalletDashboard = () => {
 
       {/* Balance Card */}
       <Card className="border-primary/20 bg-gradient-to-br from-primary/10 via-card to-accent/5">
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-primary" />
@@ -67,26 +67,26 @@ const WalletDashboard = () => {
               {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          <p className="text-4xl font-bold text-foreground mb-1">
+          <p className="text-2xl sm:text-4xl font-bold text-foreground mb-1">
             {showBalance ? "₦1,842,300.00" : "₦••••••••"}
           </p>
           <p className="text-xs text-success font-medium">+₦485,000 this month</p>
 
-          <div className="flex gap-3 mt-6">
-            <Button variant="gold" size="sm" className="flex-1" onClick={() => navigate("/dashboard/payments")}>
-              <Send className="h-4 w-4" /> Send Money
+          <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <Button variant="gold" size="sm" className="flex-1 min-w-[100px] text-xs sm:text-sm" onClick={() => navigate("/dashboard/payments")}>
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Send
             </Button>
-            <Button variant="gold-outline" size="sm" className="flex-1" onClick={() => navigate("/dashboard/payments")}>
-              <QrCode className="h-4 w-4" /> Scan to Pay
+            <Button variant="gold-outline" size="sm" className="flex-1 min-w-[100px] text-xs sm:text-sm" onClick={() => navigate("/dashboard/payments")}>
+              <QrCode className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Scan
             </Button>
-            <Button variant="gold-outline" size="sm" className="flex-1" onClick={() => navigate("/dashboard/payments")}>
-              <Smartphone className="h-4 w-4" /> NFC Pay
+            <Button variant="gold-outline" size="sm" className="flex-1 min-w-[100px] text-xs sm:text-sm" onClick={() => navigate("/dashboard/payments")}>
+              <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> NFC
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatsCard icon={ArrowUpRight} title="Money In" value="₦485,000" change="This month" changeType="positive" />
         <StatsCard icon={ArrowDownLeft} title="Money Out" value="₦145,700" change="This month" changeType="negative" />
         <StatsCard icon={CreditCard} title="Transactions" value="47" change="+12 this week" changeType="neutral" />

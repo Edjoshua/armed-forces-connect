@@ -100,4 +100,8 @@
   .glow-gold {
     box-shadow: 0 0 30px hsl(140 50% 24% / 0.15);
   }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
