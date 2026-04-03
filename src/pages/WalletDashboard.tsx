@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const recentTransactions = [
+const initialTransactions = [
   { id: "TXN-8821", type: "credit", description: "Salary Credit", amount: "+₦450,000", date: "Mar 31, 2026", status: "Completed" },
   { id: "TXN-8820", type: "debit", description: "ShopRite - Groceries", amount: "-₦12,500", date: "Mar 30, 2026", status: "Completed" },
   { id: "TXN-8819", type: "debit", description: "Transfer to SGT. Bello", amount: "-₦25,000", date: "Mar 29, 2026", status: "Completed" },
@@ -18,11 +18,32 @@ const recentTransactions = [
   { id: "TXN-8817", type: "debit", description: "MedPlus Pharmacy", amount: "-₦8,200", date: "Mar 27, 2026", status: "Pending" },
 ];
 
+const generateRefreshedTransactions = () => {
+  const now = new Date();
+  const base = [
+    { type: "credit", description: "Salary Credit", amount: "+₦450,000", status: "Completed" },
+    { type: "debit", description: "ShopRite - Groceries", amount: "-₦12,500", status: "Completed" },
+    { type: "debit", description: "Transfer to SGT. Bello", amount: "-₦25,000", status: "Completed" },
+    { type: "credit", description: "Education Fund Rebate", amount: "+₦35,000", status: "Completed" },
+    { type: "debit", description: "MedPlus Pharmacy", amount: "-₦8,200", status: "Pending" },
+  ];
+  return base.map((t, i) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    return {
+      ...t,
+      id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+      date: d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    };
+  });
+};
+
 const PULL_THRESHOLD = 80;
 
 const WalletDashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
   const [serviceStatus, setServiceStatus] = useState("active");
+  const [transactions, setTransactions] = useState(initialTransactions);
   const [refreshing, setRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
@@ -49,8 +70,9 @@ const WalletDashboard = () => {
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     fetchProfile();
-    // Simulate data refresh
+    // Refresh transactions with updated timestamps
     await new Promise((r) => setTimeout(r, 1000));
+    setTransactions(generateRefreshedTransactions());
     setRefreshing(false);
     setPullDistance(0);
     toast.success("Wallet updated");
@@ -173,7 +195,7 @@ const WalletDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-0 divide-y divide-border/30">
-              {recentTransactions.map((t) => (
+              {transactions.map((t) => (
                 <div key={t.id} className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className={`rounded-full p-2 shrink-0 ${t.type === "credit" ? "bg-success/10" : "bg-destructive/10"}`}>
