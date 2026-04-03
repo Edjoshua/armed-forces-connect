@@ -70,8 +70,9 @@ const WalletDashboard = () => {
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     fetchProfile();
-    // Simulate data refresh
+    // Refresh transactions with updated timestamps
     await new Promise((r) => setTimeout(r, 1000));
+    setTransactions(generateRefreshedTransactions());
     setRefreshing(false);
     setPullDistance(0);
     toast.success("Wallet updated");
