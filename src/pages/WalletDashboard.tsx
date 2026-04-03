@@ -195,7 +195,7 @@ const WalletDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-0 divide-y divide-border/30">
-              {recentTransactions.map((t) => (
+              {transactions.map((t) => (
                 <div key={t.id} className="flex items-center justify-between py-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className={`rounded-full p-2 shrink-0 ${t.type === "credit" ? "bg-success/10" : "bg-destructive/10"}`}>
