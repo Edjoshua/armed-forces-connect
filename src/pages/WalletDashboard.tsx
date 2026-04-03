@@ -38,6 +38,8 @@ const generateRefreshedTransactions = () => {
   });
 };
 
+const PULL_THRESHOLD = 80;
+
 const WalletDashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
   const [serviceStatus, setServiceStatus] = useState("active");
