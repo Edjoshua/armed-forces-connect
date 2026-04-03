@@ -18,7 +18,25 @@ const recentTransactions = [
   { id: "TXN-8817", type: "debit", description: "MedPlus Pharmacy", amount: "-₦8,200", date: "Mar 27, 2026", status: "Pending" },
 ];
 
-const PULL_THRESHOLD = 80;
+const generateRefreshedTransactions = () => {
+  const now = new Date();
+  const base = [
+    { type: "credit", description: "Salary Credit", amount: "+₦450,000", status: "Completed" },
+    { type: "debit", description: "ShopRite - Groceries", amount: "-₦12,500", status: "Completed" },
+    { type: "debit", description: "Transfer to SGT. Bello", amount: "-₦25,000", status: "Completed" },
+    { type: "credit", description: "Education Fund Rebate", amount: "+₦35,000", status: "Completed" },
+    { type: "debit", description: "MedPlus Pharmacy", amount: "-₦8,200", status: "Pending" },
+  ];
+  return base.map((t, i) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    return {
+      ...t,
+      id: `TXN-${Math.floor(1000 + Math.random() * 9000)}`,
+      date: d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    };
+  });
+};
 
 const WalletDashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
