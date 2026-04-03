@@ -72,15 +72,15 @@ const WalletDashboard = () => {
           </p>
           <p className="text-xs text-success font-medium">+₦485,000 this month</p>
 
-          <div className="flex gap-3 mt-6">
-            <Button variant="gold" size="sm" className="flex-1" onClick={() => navigate("/dashboard/payments")}>
-              <Send className="h-4 w-4" /> Send Money
+          <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
+            <Button variant="gold" size="sm" className="flex-1 min-w-[100px] text-xs sm:text-sm" onClick={() => navigate("/dashboard/payments")}>
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Send
             </Button>
-            <Button variant="gold-outline" size="sm" className="flex-1" onClick={() => navigate("/dashboard/payments")}>
-              <QrCode className="h-4 w-4" /> Scan to Pay
+            <Button variant="gold-outline" size="sm" className="flex-1 min-w-[100px] text-xs sm:text-sm" onClick={() => navigate("/dashboard/payments")}>
+              <QrCode className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Scan
             </Button>
-            <Button variant="gold-outline" size="sm" className="flex-1" onClick={() => navigate("/dashboard/payments")}>
-              <Smartphone className="h-4 w-4" /> NFC Pay
+            <Button variant="gold-outline" size="sm" className="flex-1 min-w-[100px] text-xs sm:text-sm" onClick={() => navigate("/dashboard/payments")}>
+              <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> NFC
             </Button>
           </div>
         </CardContent>
