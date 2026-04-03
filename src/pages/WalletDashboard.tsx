@@ -86,7 +86,7 @@ const WalletDashboard = () => {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatsCard icon={ArrowUpRight} title="Money In" value="₦485,000" change="This month" changeType="positive" />
         <StatsCard icon={ArrowDownLeft} title="Money Out" value="₦145,700" change="This month" changeType="negative" />
         <StatsCard icon={CreditCard} title="Transactions" value="47" change="+12 this week" changeType="neutral" />
