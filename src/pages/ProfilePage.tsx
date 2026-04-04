@@ -4,11 +4,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Shield, Calendar, Mail, IdCard } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Shield, Calendar, Mail, IdCard, Star, Tag } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { RANK_DISCOUNTS } from "@/components/MilitaryBarcodeCard";
+
+const RANK_OPTIONS = [
+  { value: "private", label: "Private (Pvt)" },
+  { value: "corporal", label: "Corporal (Cpl)" },
+  { value: "sergeant", label: "Sergeant (Sgt)" },
+  { value: "lieutenant", label: "Lieutenant (Lt)" },
+  { value: "captain", label: "Captain (Capt)" },
+  { value: "major", label: "Major (Maj)" },
+  { value: "colonel", label: "Colonel (Col)" },
+  { value: "general", label: "General (Gen)" },
+];
 
 const ProfilePage = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
   const initials = userName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -28,6 +44,26 @@ const ProfilePage = () => {
   }, [user]);
 
   const serviceStatus = profile?.service_status || "active";
+  const currentRank = profile?.military_rank || "private";
+  const rankInfo = RANK_DISCOUNTS[currentRank] || RANK_DISCOUNTS.private;
+
+  const handleRankChange = async (newRank: string) => {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ military_rank: newRank } as any)
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to update rank", variant: "destructive" });
+    } else {
+      setProfile((prev: any) => ({ ...prev, military_rank: newRank }));
+      const info = RANK_DISCOUNTS[newRank] || RANK_DISCOUNTS.private;
+      toast({ title: "Rank Updated", description: `Set to ${info.label} — ${info.discount}% discount tier` });
+    }
+    setSaving(false);
+  };
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -73,6 +109,38 @@ const ProfilePage = () => {
               <p className="text-xs text-muted-foreground">Service Status</p>
               <p className="text-sm font-medium text-foreground capitalize">{serviceStatus}</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Military Rank Selector */}
+      <Card className="border-border/50 bg-card/80">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2"><Star className="h-4 w-4 text-primary" /> Military Rank</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Select value={currentRank} onValueChange={handleRankChange} disabled={saving}>
+            <SelectTrigger className="bg-secondary/50 border-border/50">
+              <SelectValue placeholder="Select your rank" />
+            </SelectTrigger>
+            <SelectContent>
+              {RANK_OPTIONS.map((r) => (
+                <SelectItem key={r.value} value={r.value}>
+                  {r.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <div className="flex items-center justify-between p-3 rounded-lg bg-primary/5 border border-primary/15">
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-primary" />
+              <div>
+                <p className="text-xs text-muted-foreground">Discount Tier</p>
+                <p className="text-sm font-semibold text-foreground">{rankInfo.tier}</p>
+              </div>
+            </div>
+            <p className="text-xl font-black text-primary">{rankInfo.discount}%</p>
           </div>
         </CardContent>
       </Card>
