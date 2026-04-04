@@ -80,7 +80,7 @@ const PaymentsDashboard = () => {
           <TabsTrigger value="merchant" className="text-xs"><Store className="h-3.5 w-3.5 mr-1" /> Merchant</TabsTrigger>
         </TabsList>
 
-        {/* Barcode Military ID Tab */}
+        {/* QR Code Military ID Tab */}
         <TabsContent value="scan">
           <div className="space-y-4">
             <MilitaryBarcodeCard onDiscountReady={(d) => setMilitaryDiscount(d)} />
@@ -88,10 +88,10 @@ const PaymentsDashboard = () => {
             <Card className="border-border/50 bg-card/80">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Barcode className="h-5 w-5 text-primary" /> Pay with Military Barcode
+                  <QrCode className="h-5 w-5 text-primary" /> Pay with Military QR Code
                 </CardTitle>
                 <CardDescription>
-                  Present your barcode at checkout — your rank-based discount is applied automatically
+                  Present your QR code at checkout — your rank-based discount is applied automatically
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
