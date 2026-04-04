@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { QrCode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Camera, Tag } from "lucide-react";
+import { Barcode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import MilitaryBarcodeCard from "@/components/MilitaryBarcodeCard";
 
 const savedMerchants = [
   { name: "ShopRite Abuja", category: "Retail", icon: Store, discount: "15%" },
