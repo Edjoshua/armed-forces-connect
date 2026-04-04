@@ -50,23 +50,19 @@ const PaymentsDashboard = () => {
     setMerchantAmount("");
   };
 
-  const handleQrPay = (discount?: string) => {
-    if (!qrAmount) {
+  const handleBarcodePay = () => {
+    if (!barcodeAmount) {
       toast({ title: "Enter amount", description: "Please enter the payment amount", variant: "destructive" });
       return;
     }
-    const amount = Number(qrAmount);
-    if (discount) {
-      const discountPct = parseInt(discount) / 100;
-      const discounted = amount - amount * discountPct;
-      toast({
-        title: "QR Payment with Discount!",
-        description: `Original: ₦${amount.toLocaleString()} → Discounted: ₦${discounted.toLocaleString()} (${discount} off)`,
-      });
-    } else {
-      toast({ title: "QR Payment Successful", description: `₦${amount.toLocaleString()} paid via QR code` });
-    }
-    setQrAmount("");
+    const amount = Number(barcodeAmount);
+    const discountPct = militaryDiscount / 100;
+    const discounted = amount - amount * discountPct;
+    toast({
+      title: "Barcode Payment with Military Discount!",
+      description: `Original: ₦${amount.toLocaleString()} → Discounted: ₦${discounted.toLocaleString()} (${militaryDiscount}% off)`,
+    });
+    setBarcodeAmount("");
   };
 
   return (
