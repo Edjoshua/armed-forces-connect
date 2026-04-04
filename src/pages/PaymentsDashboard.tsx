@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Barcode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Tag } from "lucide-react";
+import { QrCode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
