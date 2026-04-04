@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN military_rank text NOT NULL DEFAULT 'private';

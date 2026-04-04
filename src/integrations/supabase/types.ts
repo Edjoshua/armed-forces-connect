@@ -21,6 +21,7 @@ export type Database = {
           full_name: string | null
           id: string
           military_id: string | null
+          military_rank: string
           service_status: string
           updated_at: string
           user_id: string
@@ -31,6 +32,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           military_id?: string | null
+          military_rank?: string
           service_status?: string
           updated_at?: string
           user_id: string
@@ -41,6 +43,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           military_id?: string | null
+          military_rank?: string
           service_status?: string
           updated_at?: string
           user_id?: string
