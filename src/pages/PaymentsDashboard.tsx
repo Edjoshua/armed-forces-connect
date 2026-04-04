@@ -74,7 +74,7 @@ const PaymentsDashboard = () => {
 
       <Tabs defaultValue="scan" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4 bg-secondary/50">
-          <TabsTrigger value="scan" className="text-xs"><Barcode className="h-3.5 w-3.5 mr-1" /> Barcode</TabsTrigger>
+          <TabsTrigger value="scan" className="text-xs"><QrCode className="h-3.5 w-3.5 mr-1" /> QR Code</TabsTrigger>
           <TabsTrigger value="nfc" className="text-xs"><Smartphone className="h-3.5 w-3.5 mr-1" /> NFC</TabsTrigger>
           <TabsTrigger value="transfer" className="text-xs"><Send className="h-3.5 w-3.5 mr-1" /> Transfer</TabsTrigger>
           <TabsTrigger value="merchant" className="text-xs"><Store className="h-3.5 w-3.5 mr-1" /> Merchant</TabsTrigger>
