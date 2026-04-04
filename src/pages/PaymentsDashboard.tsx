@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { QrCode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Camera, Tag } from "lucide-react";
+import { Barcode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import MilitaryBarcodeCard from "@/components/MilitaryBarcodeCard";
 
 const savedMerchants = [
   { name: "ShopRite Abuja", category: "Retail", icon: Store, discount: "15%" },
@@ -20,7 +21,8 @@ const PaymentsDashboard = () => {
   const [recipientAccount, setRecipientAccount] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [merchantAmount, setMerchantAmount] = useState("");
-  const [qrAmount, setQrAmount] = useState("");
+  const [barcodeAmount, setBarcodeAmount] = useState("");
+  const [militaryDiscount, setMilitaryDiscount] = useState(20);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const { toast } = useToast();
 
@@ -48,23 +50,19 @@ const PaymentsDashboard = () => {
     setMerchantAmount("");
   };
 
-  const handleQrPay = (discount?: string) => {
-    if (!qrAmount) {
+  const handleBarcodePay = () => {
+    if (!barcodeAmount) {
       toast({ title: "Enter amount", description: "Please enter the payment amount", variant: "destructive" });
       return;
     }
-    const amount = Number(qrAmount);
-    if (discount) {
-      const discountPct = parseInt(discount) / 100;
-      const discounted = amount - amount * discountPct;
-      toast({
-        title: "QR Payment with Discount!",
-        description: `Original: ₦${amount.toLocaleString()} → Discounted: ₦${discounted.toLocaleString()} (${discount} off)`,
-      });
-    } else {
-      toast({ title: "QR Payment Successful", description: `₦${amount.toLocaleString()} paid via QR code` });
-    }
-    setQrAmount("");
+    const amount = Number(barcodeAmount);
+    const discountPct = militaryDiscount / 100;
+    const discounted = amount - amount * discountPct;
+    toast({
+      title: "Barcode Payment with Military Discount!",
+      description: `Original: ₦${amount.toLocaleString()} → Discounted: ₦${discounted.toLocaleString()} (${militaryDiscount}% off)`,
+    });
+    setBarcodeAmount("");
   };
 
   return (
@@ -76,60 +74,53 @@ const PaymentsDashboard = () => {
 
       <Tabs defaultValue="scan" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4 bg-secondary/50">
-          <TabsTrigger value="scan" className="text-xs"><QrCode className="h-3.5 w-3.5 mr-1" /> Scan</TabsTrigger>
+          <TabsTrigger value="scan" className="text-xs"><Barcode className="h-3.5 w-3.5 mr-1" /> Barcode</TabsTrigger>
           <TabsTrigger value="nfc" className="text-xs"><Smartphone className="h-3.5 w-3.5 mr-1" /> NFC</TabsTrigger>
           <TabsTrigger value="transfer" className="text-xs"><Send className="h-3.5 w-3.5 mr-1" /> Transfer</TabsTrigger>
           <TabsTrigger value="merchant" className="text-xs"><Store className="h-3.5 w-3.5 mr-1" /> Merchant</TabsTrigger>
         </TabsList>
 
-        {/* QR Scan Tab with Discount */}
+        {/* Barcode Military ID Tab */}
         <TabsContent value="scan">
-          <Card className="border-border/50 bg-card/80">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2"><QrCode className="h-5 w-5 text-primary" /> Scan QR Code to Pay</CardTitle>
-              <CardDescription>Scan a merchant's QR code — military discounts are applied automatically</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center gap-6">
-              <div className="w-64 h-64 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 flex flex-col items-center justify-center gap-3">
-                <Camera className="h-12 w-12 text-primary/40" />
-                <p className="text-sm text-muted-foreground text-center px-4">Camera preview will appear here</p>
-              </div>
+          <div className="space-y-4">
+            <MilitaryBarcodeCard onDiscountReady={(d) => setMilitaryDiscount(d)} />
 
-              <div className="w-full max-w-xs space-y-3">
-                <Label className="text-xs">Payment Amount (₦)</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={qrAmount}
-                  onChange={(e) => setQrAmount(e.target.value)}
-                  className="text-center text-lg font-mono bg-secondary/50 border-border/50"
-                />
-              </div>
-
-              <div className="flex gap-2 w-full max-w-xs">
-                <Button variant="gold" className="flex-1" onClick={() => handleQrPay("15%")}>
-                  <Tag className="h-4 w-4" /> Pay with 15% off
-                </Button>
-                <Button variant="gold-outline" className="flex-1" onClick={() => handleQrPay()}>
-                  Pay Full
-                </Button>
-              </div>
-
-              <div className="w-full max-w-xs rounded-lg bg-success/5 border border-success/20 p-3">
-                <p className="text-xs text-success font-medium flex items-center gap-1">
-                  <Tag className="h-3 w-3" /> Military personnel get automatic discounts at partner merchants when paying via QR code
-                </p>
-              </div>
-
-              <div className="w-full max-w-xs space-y-3">
-                <Label className="text-xs text-muted-foreground">Or enter QR code manually</Label>
-                <div className="flex gap-2">
-                  <Input placeholder="Enter merchant code..." className="text-sm bg-secondary/50 border-border/50" />
-                  <Button variant="gold-outline" size="sm">Pay</Button>
+            <Card className="border-border/50 bg-card/80">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Barcode className="h-5 w-5 text-primary" /> Pay with Military Barcode
+                </CardTitle>
+                <CardDescription>
+                  Present your barcode at checkout — your rank-based discount is applied automatically
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs">Payment Amount (₦)</Label>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    value={barcodeAmount}
+                    onChange={(e) => setBarcodeAmount(e.target.value)}
+                    className="text-center text-lg font-mono bg-secondary/50 border-border/50"
+                  />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+
+                {barcodeAmount && Number(barcodeAmount) > 0 && (
+                  <div className="rounded-lg bg-primary/5 border border-primary/15 p-3 text-center space-y-1">
+                    <p className="text-xs text-muted-foreground">After {militaryDiscount}% military discount</p>
+                    <p className="text-xl font-bold text-primary">
+                      ₦{(Number(barcodeAmount) * (1 - militaryDiscount / 100)).toLocaleString()}
+                    </p>
+                  </div>
+                )}
+
+                <Button variant="gold" className="w-full" onClick={handleBarcodePay}>
+                  <Tag className="h-4 w-4" /> Pay with {militaryDiscount}% Discount
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* NFC Tab */}
