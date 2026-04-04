@@ -21,7 +21,8 @@ const PaymentsDashboard = () => {
   const [recipientAccount, setRecipientAccount] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [merchantAmount, setMerchantAmount] = useState("");
-  const [qrAmount, setQrAmount] = useState("");
+  const [barcodeAmount, setBarcodeAmount] = useState("");
+  const [militaryDiscount, setMilitaryDiscount] = useState(20);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const { toast } = useToast();
 
