@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, CheckCircle2, Star } from "lucide-react";
+import { Shield, CheckCircle2, Star, QrCode } from "lucide-react";
 
 const RANK_DISCOUNTS: Record<string, { label: string; discount: number; tier: string }> = {
   private: { label: "Private (Pvt)", discount: 10, tier: "Bronze" },
@@ -53,11 +53,24 @@ const MilitaryBarcodeCard = ({ onDiscountReady }: { onDiscountReady: (discount: 
   const isActive = serviceStatus === "active";
   const tierColor = TIER_COLORS[rankInfo.tier] || TIER_COLORS.Bronze;
 
-  // Generate barcode bars from military ID
-  const barcodePattern = (militaryId || "000000").split("").map((char, i) => {
-    const code = char.charCodeAt(0);
-    return { width: (code % 3) + 1, gap: (code % 2) + 1, key: i };
-  });
+  // Generate QR code grid pattern from military ID
+  const qrSeed = (militaryId || "000000").split("").map((c) => c.charCodeAt(0));
+  const qrGrid: boolean[][] = [];
+  for (let row = 0; row < 9; row++) {
+    qrGrid[row] = [];
+    for (let col = 0; col < 9; col++) {
+      const idx = (row * 9 + col) % qrSeed.length;
+      qrGrid[row][col] = (qrSeed[idx] + row + col) % 3 !== 0;
+    }
+  }
+  // Fixed position markers (top-left, top-right, bottom-left)
+  const setMarker = (sr: number, sc: number) => {
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) qrGrid[sr + r][sc + c] = true;
+    qrGrid[sr + 1][sc + 1] = false;
+  };
+  setMarker(0, 0);
+  setMarker(0, 6);
+  setMarker(6, 0);
 
   return (
     <Card className="border-border/50 bg-gradient-to-br from-card to-secondary/30 overflow-hidden">
@@ -96,24 +109,22 @@ const MilitaryBarcodeCard = ({ onDiscountReady }: { onDiscountReady: (discount: 
             </div>
           </div>
 
-          {/* Barcode Visual */}
-          <div className="bg-background rounded-lg p-3 border border-border/30">
-            <div className="flex items-end justify-center gap-[1px] h-14">
-              {barcodePattern.map((bar) => (
+          {/* QR Code Visual */}
+          <div className="bg-background rounded-lg p-3 border border-border/30 flex flex-col items-center">
+            <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(9, 1fr)` }}>
+              {qrGrid.flat().map((filled, i) => (
                 <div
-                  key={bar.key}
-                  className="bg-foreground rounded-sm"
-                  style={{
-                    width: `${bar.width * 2}px`,
-                    height: `${40 + (bar.width * 8)}%`,
-                    marginRight: `${bar.gap}px`,
-                  }}
+                  key={i}
+                  className={`w-3 h-3 rounded-[2px] ${filled ? "bg-foreground" : "bg-transparent"}`}
                 />
               ))}
             </div>
-            <p className="text-center text-[10px] font-mono text-muted-foreground mt-1.5 tracking-[0.3em]">
-              {militaryId.replace(/[^A-Z0-9]/gi, "").padEnd(12, "0").slice(0, 12)}
-            </p>
+            <div className="flex items-center gap-1.5 mt-2">
+              <QrCode className="h-3 w-3 text-muted-foreground" />
+              <p className="text-[10px] font-mono text-muted-foreground tracking-[0.2em]">
+                {militaryId.replace(/[^A-Z0-9]/gi, "").padEnd(12, "0").slice(0, 12)}
+              </p>
+            </div>
           </div>
 
           {/* Verification Status */}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Barcode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Tag } from "lucide-react";
+import { QrCode, Smartphone, Send, Store, Building2, ArrowRight, CheckCircle2, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,7 +59,7 @@ const PaymentsDashboard = () => {
     const discountPct = militaryDiscount / 100;
     const discounted = amount - amount * discountPct;
     toast({
-      title: "Barcode Payment with Military Discount!",
+      title: "QR Code Payment with Military Discount!",
       description: `Original: ₦${amount.toLocaleString()} → Discounted: ₦${discounted.toLocaleString()} (${militaryDiscount}% off)`,
     });
     setBarcodeAmount("");
@@ -74,13 +74,13 @@ const PaymentsDashboard = () => {
 
       <Tabs defaultValue="scan" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4 bg-secondary/50">
-          <TabsTrigger value="scan" className="text-xs"><Barcode className="h-3.5 w-3.5 mr-1" /> Barcode</TabsTrigger>
+          <TabsTrigger value="scan" className="text-xs"><QrCode className="h-3.5 w-3.5 mr-1" /> QR Code</TabsTrigger>
           <TabsTrigger value="nfc" className="text-xs"><Smartphone className="h-3.5 w-3.5 mr-1" /> NFC</TabsTrigger>
           <TabsTrigger value="transfer" className="text-xs"><Send className="h-3.5 w-3.5 mr-1" /> Transfer</TabsTrigger>
           <TabsTrigger value="merchant" className="text-xs"><Store className="h-3.5 w-3.5 mr-1" /> Merchant</TabsTrigger>
         </TabsList>
 
-        {/* Barcode Military ID Tab */}
+        {/* QR Code Military ID Tab */}
         <TabsContent value="scan">
           <div className="space-y-4">
             <MilitaryBarcodeCard onDiscountReady={(d) => setMilitaryDiscount(d)} />
@@ -88,10 +88,10 @@ const PaymentsDashboard = () => {
             <Card className="border-border/50 bg-card/80">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Barcode className="h-5 w-5 text-primary" /> Pay with Military Barcode
+                  <QrCode className="h-5 w-5 text-primary" /> Pay with Military QR Code
                 </CardTitle>
                 <CardDescription>
-                  Present your barcode at checkout — your rank-based discount is applied automatically
+                  Present your QR code at checkout — your rank-based discount is applied automatically
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
