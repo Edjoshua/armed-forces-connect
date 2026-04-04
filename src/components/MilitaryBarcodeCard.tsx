@@ -109,24 +109,22 @@ const MilitaryBarcodeCard = ({ onDiscountReady }: { onDiscountReady: (discount: 
             </div>
           </div>
 
-          {/* Barcode Visual */}
-          <div className="bg-background rounded-lg p-3 border border-border/30">
-            <div className="flex items-end justify-center gap-[1px] h-14">
-              {barcodePattern.map((bar) => (
+          {/* QR Code Visual */}
+          <div className="bg-background rounded-lg p-3 border border-border/30 flex flex-col items-center">
+            <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(9, 1fr)` }}>
+              {qrGrid.flat().map((filled, i) => (
                 <div
-                  key={bar.key}
-                  className="bg-foreground rounded-sm"
-                  style={{
-                    width: `${bar.width * 2}px`,
-                    height: `${40 + (bar.width * 8)}%`,
-                    marginRight: `${bar.gap}px`,
-                  }}
+                  key={i}
+                  className={`w-3 h-3 rounded-[2px] ${filled ? "bg-foreground" : "bg-transparent"}`}
                 />
               ))}
             </div>
-            <p className="text-center text-[10px] font-mono text-muted-foreground mt-1.5 tracking-[0.3em]">
-              {militaryId.replace(/[^A-Z0-9]/gi, "").padEnd(12, "0").slice(0, 12)}
-            </p>
+            <div className="flex items-center gap-1.5 mt-2">
+              <QrCode className="h-3 w-3 text-muted-foreground" />
+              <p className="text-[10px] font-mono text-muted-foreground tracking-[0.2em]">
+                {militaryId.replace(/[^A-Z0-9]/gi, "").padEnd(12, "0").slice(0, 12)}
+              </p>
+            </div>
           </div>
 
           {/* Verification Status */}
