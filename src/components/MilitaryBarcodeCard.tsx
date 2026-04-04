@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, CheckCircle2, Star } from "lucide-react";
+import { Shield, CheckCircle2, Star, QrCode } from "lucide-react";
 
 const RANK_DISCOUNTS: Record<string, { label: string; discount: number; tier: string }> = {
   private: { label: "Private (Pvt)", discount: 10, tier: "Bronze" },
