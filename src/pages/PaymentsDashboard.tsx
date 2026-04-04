@@ -59,7 +59,7 @@ const PaymentsDashboard = () => {
     const discountPct = militaryDiscount / 100;
     const discounted = amount - amount * discountPct;
     toast({
-      title: "Barcode Payment with Military Discount!",
+      title: "QR Code Payment with Military Discount!",
       description: `Original: ₦${amount.toLocaleString()} → Discounted: ₦${discounted.toLocaleString()} (${militaryDiscount}% off)`,
     });
     setBarcodeAmount("");
