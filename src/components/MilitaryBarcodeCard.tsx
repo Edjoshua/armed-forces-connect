@@ -53,11 +53,24 @@ const MilitaryBarcodeCard = ({ onDiscountReady }: { onDiscountReady: (discount: 
   const isActive = serviceStatus === "active";
   const tierColor = TIER_COLORS[rankInfo.tier] || TIER_COLORS.Bronze;
 
-  // Generate barcode bars from military ID
-  const barcodePattern = (militaryId || "000000").split("").map((char, i) => {
-    const code = char.charCodeAt(0);
-    return { width: (code % 3) + 1, gap: (code % 2) + 1, key: i };
-  });
+  // Generate QR code grid pattern from military ID
+  const qrSeed = (militaryId || "000000").split("").map((c) => c.charCodeAt(0));
+  const qrGrid: boolean[][] = [];
+  for (let row = 0; row < 9; row++) {
+    qrGrid[row] = [];
+    for (let col = 0; col < 9; col++) {
+      const idx = (row * 9 + col) % qrSeed.length;
+      qrGrid[row][col] = (qrSeed[idx] + row + col) % 3 !== 0;
+    }
+  }
+  // Fixed position markers (top-left, top-right, bottom-left)
+  const setMarker = (sr: number, sc: number) => {
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) qrGrid[sr + r][sc + c] = true;
+    qrGrid[sr + 1][sc + 1] = false;
+  };
+  setMarker(0, 0);
+  setMarker(0, 6);
+  setMarker(6, 0);
 
   return (
     <Card className="border-border/50 bg-gradient-to-br from-card to-secondary/30 overflow-hidden">
