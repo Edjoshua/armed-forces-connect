@@ -74,8 +74,8 @@ const MilitaryBarcodeCard = ({ onDiscountReady }: { onDiscountReady: (discount: 
             <Shield className="h-4 w-4 text-primary" />
             <span className="text-xs font-bold text-primary tracking-wider uppercase">Military Welfare ID</span>
           </div>
-          <Badge variant="outline" className={`text-[10px] ${tierColor}`}>
-            {rankInfo.tier} Tier
+          <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">
+            {rankInfo.discount}% Discount
           </Badge>
         </div>
 
