@@ -98,8 +98,8 @@ const ProfilePage = () => {
             <div className="flex items-center gap-2">
               <Tag className="h-4 w-4 text-primary" />
               <div>
-                <p className="text-xs text-muted-foreground">Discount Tier</p>
-                <p className="text-sm font-semibold text-foreground">{rankInfo.tier}</p>
+                <p className="text-xs text-muted-foreground">Discount</p>
+                <p className="text-sm font-semibold text-foreground">{rankInfo.label}</p>
               </div>
             </div>
             <p className="text-xl font-black text-primary">{rankInfo.discount}%</p>
