@@ -44,7 +44,7 @@ const MilitaryBarcodeCard = ({ onDiscountReady }: { onDiscountReady: (discount: 
   const rankInfo = RANK_DISCOUNTS[rank] || RANK_DISCOUNTS.private;
   const serviceStatus = profile?.service_status || "active";
   const isActive = serviceStatus === "active";
-  const tierColor = TIER_COLORS[rankInfo.tier] || TIER_COLORS.Bronze;
+  
 
   // Generate QR code grid pattern from military ID
   const qrSeed = (militaryId || "000000").split("").map((c) => c.charCodeAt(0));
