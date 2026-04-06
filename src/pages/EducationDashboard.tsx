@@ -1,17 +1,30 @@
 import { useState } from "react";
-import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart } from "lucide-react";
+import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, X, UserPlus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import StatsCard from "@/components/StatsCard";
 import { useToast } from "@/hooks/use-toast";
 
-const myChildren = [
-  { name: "Aisha", school: "University of Lagos", fund: 580000, goal: 1200000, status: "Enrolled", year: "Year 2" },
-  { name: "David", school: "Not yet assigned", fund: 320000, goal: 1000000, status: "Saving", year: "—" },
+interface Dependent {
+  name: string;
+  school: string;
+  fund: number;
+  goal: number;
+  status: string;
+  year: string;
+  relationship: string;
+  dateOfBirth: string;
+}
+
+const initialChildren: Dependent[] = [
+  { name: "Aisha", school: "University of Lagos", fund: 580000, goal: 1200000, status: "Enrolled", year: "Year 2", relationship: "Daughter", dateOfBirth: "2005-03-15" },
+  { name: "David", school: "Not yet assigned", fund: 320000, goal: 1000000, status: "Saving", year: "—", relationship: "Son", dateOfBirth: "2010-08-22" },
 ];
 
 const statusStyle: Record<string, string> = {
@@ -34,6 +47,9 @@ const contributions = [
 
 const EducationDashboard = () => {
   const [crowdfundAmount, setCrowdfundAmount] = useState("");
+  const [dependents, setDependents] = useState<Dependent[]>(initialChildren);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
   const { toast } = useToast();
 
   const handleDonate = (campaignName: string) => {
@@ -43,6 +59,31 @@ const EducationDashboard = () => {
     }
     toast({ title: "Donation Sent!", description: `₦${Number(crowdfundAmount).toLocaleString()} contributed to ${campaignName}` });
     setCrowdfundAmount("");
+  };
+
+  const handleAddDependent = () => {
+    if (!newDep.name.trim() || !newDep.dateOfBirth) {
+      toast({ title: "Missing info", description: "Please fill in the dependent's name and date of birth", variant: "destructive" });
+      return;
+    }
+    if (dependents.length >= 2) {
+      toast({ title: "Limit reached", description: "You can register a maximum of 2 dependents", variant: "destructive" });
+      return;
+    }
+    const dep: Dependent = {
+      name: newDep.name.trim(),
+      school: newDep.school.trim() || "Not yet assigned",
+      fund: 0,
+      goal: Number(newDep.goal) || 1000000,
+      status: "Saving",
+      year: "—",
+      relationship: newDep.relationship,
+      dateOfBirth: newDep.dateOfBirth,
+    };
+    setDependents((prev) => [...prev, dep]);
+    setNewDep({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
+    setShowAddDialog(false);
+    toast({ title: "Dependent Added", description: `${dep.name} has been registered as your ${dep.relationship.toLowerCase()}` });
   };
 
   return (
@@ -55,25 +96,49 @@ const EducationDashboard = () => {
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <StatsCard icon={Wallet} title="My Total Fund" value="₦900,000" change="+₦50,000 this month" changeType="positive" />
         <StatsCard icon={TrendingUp} title="Govt Match" value="₦97,500" change="50% matching active" changeType="positive" />
-        <StatsCard icon={GraduationCap} title="Dependents" value="2" change="1 enrolled, 1 saving" changeType="neutral" />
+        <StatsCard icon={GraduationCap} title="Dependents" value={String(dependents.length)} change={`Max 2 allowed`} changeType="neutral" />
         <StatsCard icon={BookOpen} title="Scholarships" value="1" change="Applied — pending" changeType="neutral" />
       </div>
 
-      {/* My Children */}
+      {/* My Dependents */}
       <Card className="border-border/50 bg-card/80">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">My Dependents</CardTitle>
-            <Button variant="gold" size="sm"><PlusCircle className="h-3.5 w-3.5" /> Add Dependent</Button>
+            <Button
+              variant="gold"
+              size="sm"
+              onClick={() => {
+                if (dependents.length >= 2) {
+                  toast({ title: "Limit reached", description: "Maximum of 2 dependents allowed per service member", variant: "destructive" });
+                  return;
+                }
+                setShowAddDialog(true);
+              }}
+            >
+              <PlusCircle className="h-3.5 w-3.5" /> Add Dependent
+            </Button>
           </div>
+          <p className="text-xs text-muted-foreground">You can register up to 2 children for the education savings scheme</p>
         </CardHeader>
         <CardContent className="space-y-4">
-          {myChildren.map((child, i) => (
+          {dependents.length === 0 && (
+            <div className="text-center py-8 rounded-lg border border-dashed border-border/50">
+              <UserPlus className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm font-medium text-muted-foreground">No dependents registered</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Add a dependent to start saving for their education</p>
+              <Button variant="gold" size="sm" className="mt-4" onClick={() => setShowAddDialog(true)}>
+                <PlusCircle className="h-3.5 w-3.5" /> Add Your First Dependent
+              </Button>
+            </div>
+          )}
+          {dependents.map((child, i) => (
             <div key={i} className="rounded-lg border border-border/30 bg-secondary/30 p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-foreground">{child.name}</p>
-                  <Badge variant="outline" className={statusStyle[child.status]}>{child.status}</Badge>
+                  <Badge variant="outline" className={statusStyle[child.status] || "border-border/50 text-muted-foreground"}>{child.status}</Badge>
+                  <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{child.relationship}</Badge>
                 </div>
                 <span className="text-xs text-muted-foreground">{child.year}</span>
               </div>
@@ -92,6 +157,77 @@ const EducationDashboard = () => {
           ))}
         </CardContent>
       </Card>
+
+      {/* Add Dependent Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-primary" /> Add Dependent
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label className="text-xs">Full Name *</Label>
+              <Input
+                placeholder="Enter dependent's full name"
+                value={newDep.name}
+                onChange={(e) => setNewDep((p) => ({ ...p, name: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Relationship *</Label>
+              <Select value={newDep.relationship} onValueChange={(v) => setNewDep((p) => ({ ...p, relationship: v }))}>
+                <SelectTrigger className="bg-secondary/50 border-border/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Son">Son</SelectItem>
+                  <SelectItem value="Daughter">Daughter</SelectItem>
+                  <SelectItem value="Ward">Ward</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Date of Birth *</Label>
+              <Input
+                type="date"
+                value={newDep.dateOfBirth}
+                onChange={(e) => setNewDep((p) => ({ ...p, dateOfBirth: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">School (optional)</Label>
+              <Input
+                placeholder="e.g. University of Lagos"
+                value={newDep.school}
+                onChange={(e) => setNewDep((p) => ({ ...p, school: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Savings Goal (₦)</Label>
+              <Input
+                type="number"
+                placeholder="e.g. 1000000"
+                value={newDep.goal}
+                onChange={(e) => setNewDep((p) => ({ ...p, goal: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="ghost" size="sm">Cancel</Button>
+            </DialogClose>
+            <Button variant="gold" size="sm" onClick={handleAddDependent}>
+              <PlusCircle className="h-3.5 w-3.5" /> Add Dependent
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Crowdfunding Section */}
       <Card className="border-border/50 bg-card/80">
