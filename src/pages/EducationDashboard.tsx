@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, X, UserPlus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,26 +10,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import StatsCard from "@/components/StatsCard";
 import { useToast } from "@/hooks/use-toast";
-
-interface Dependent {
-  name: string;
-  school: string;
-  fund: number;
-  goal: number;
-  status: string;
-  year: string;
-  relationship: string;
-  dateOfBirth: string;
-}
-
-const initialChildren: Dependent[] = [
-  { name: "Aisha", school: "University of Lagos", fund: 580000, goal: 1200000, status: "Enrolled", year: "Year 2", relationship: "Daughter", dateOfBirth: "2005-03-15" },
-  { name: "David", school: "Not yet assigned", fund: 320000, goal: 1000000, status: "Saving", year: "—", relationship: "Son", dateOfBirth: "2010-08-22" },
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const statusStyle: Record<string, string> = {
-  Enrolled: "bg-success/10 text-success border-success/20",
-  Saving: "bg-info/10 text-info border-info/20",
+  approved: "bg-success/10 text-success border-success/20",
+  pending: "bg-warning/10 text-warning border-warning/20",
+  rejected: "bg-destructive/10 text-destructive border-destructive/20",
+};
+
+const statusIcons: Record<string, typeof Clock> = {
+  pending: Clock,
+  approved: CheckCircle2,
+  rejected: XCircle,
 };
 
 const crowdfundCampaigns = [
@@ -47,10 +40,28 @@ const contributions = [
 
 const EducationDashboard = () => {
   const [crowdfundAmount, setCrowdfundAmount] = useState("");
-  const [dependents, setDependents] = useState<Dependent[]>(initialChildren);
+  const [dependents, setDependents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  const fetchDependents = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("dependents")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true });
+    setDependents(data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchDependents();
+  }, [user]);
 
   const handleDonate = (campaignName: string) => {
     if (!crowdfundAmount || Number(crowdfundAmount) <= 0) {
@@ -61,7 +72,8 @@ const EducationDashboard = () => {
     setCrowdfundAmount("");
   };
 
-  const handleAddDependent = () => {
+  const handleAddDependent = async () => {
+    if (!user) return;
     if (!newDep.name.trim() || !newDep.dateOfBirth) {
       toast({ title: "Missing info", description: "Please fill in the dependent's name and date of birth", variant: "destructive" });
       return;
@@ -70,21 +82,34 @@ const EducationDashboard = () => {
       toast({ title: "Limit reached", description: "You can register a maximum of 2 dependents", variant: "destructive" });
       return;
     }
-    const dep: Dependent = {
+
+    setSubmitting(true);
+    const { error } = await supabase.from("dependents").insert({
+      user_id: user.id,
       name: newDep.name.trim(),
-      school: newDep.school.trim() || "Not yet assigned",
-      fund: 0,
-      goal: Number(newDep.goal) || 1000000,
-      status: "Saving",
-      year: "—",
       relationship: newDep.relationship,
-      dateOfBirth: newDep.dateOfBirth,
-    };
-    setDependents((prev) => [...prev, dep]);
-    setNewDep({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
-    setShowAddDialog(false);
-    toast({ title: "Dependent Added", description: `${dep.name} has been registered as your ${dep.relationship.toLowerCase()}` });
+      date_of_birth: newDep.dateOfBirth,
+      school: newDep.school.trim() || "Not yet assigned",
+      savings_goal: Number(newDep.goal) || 1000000,
+    });
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to add dependent. Please try again.", variant: "destructive" });
+    } else {
+      setNewDep({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
+      setShowAddDialog(false);
+      toast({
+        title: "Dependent Submitted",
+        description: "Your dependent has been submitted for admin verification. You'll be notified once approved.",
+      });
+      fetchDependents();
+    }
+    setSubmitting(false);
   };
+
+  const approvedCount = dependents.filter((d) => d.status === "approved").length;
+  const pendingCount = dependents.filter((d) => d.status === "pending").length;
+  const totalFund = dependents.reduce((sum: number, d: any) => sum + Number(d.fund_balance || 0), 0);
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -94,9 +119,9 @@ const EducationDashboard = () => {
       </div>
 
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <StatsCard icon={Wallet} title="My Total Fund" value="₦900,000" change="+₦50,000 this month" changeType="positive" />
+        <StatsCard icon={Wallet} title="My Total Fund" value={`₦${(totalFund / 1000).toFixed(0)}K`} change="+₦50,000 this month" changeType="positive" />
         <StatsCard icon={TrendingUp} title="Govt Match" value="₦97,500" change="50% matching active" changeType="positive" />
-        <StatsCard icon={GraduationCap} title="Dependents" value={String(dependents.length)} change={`Max 2 allowed`} changeType="neutral" />
+        <StatsCard icon={GraduationCap} title="Dependents" value={String(dependents.length)} change={`${approvedCount} approved, ${pendingCount} pending`} changeType="neutral" />
         <StatsCard icon={BookOpen} title="Scholarships" value="1" change="Applied — pending" changeType="neutral" />
       </div>
 
@@ -119,10 +144,12 @@ const EducationDashboard = () => {
               <PlusCircle className="h-3.5 w-3.5" /> Add Dependent
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">You can register up to 2 children for the education savings scheme</p>
+          <p className="text-xs text-muted-foreground">You can register up to 2 children. Each must be verified by admin before activation.</p>
         </CardHeader>
         <CardContent className="space-y-4">
-          {dependents.length === 0 && (
+          {loading && <p className="text-sm text-muted-foreground text-center py-4">Loading…</p>}
+
+          {!loading && dependents.length === 0 && (
             <div className="text-center py-8 rounded-lg border border-dashed border-border/50">
               <UserPlus className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
               <p className="text-sm font-medium text-muted-foreground">No dependents registered</p>
@@ -132,29 +159,61 @@ const EducationDashboard = () => {
               </Button>
             </div>
           )}
-          {dependents.map((child, i) => (
-            <div key={i} className="rounded-lg border border-border/30 bg-secondary/30 p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground">{child.name}</p>
-                  <Badge variant="outline" className={statusStyle[child.status] || "border-border/50 text-muted-foreground"}>{child.status}</Badge>
-                  <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{child.relationship}</Badge>
+
+          {dependents.map((dep) => {
+            const StatusIcon = statusIcons[dep.status] || Clock;
+            const isApproved = dep.status === "approved";
+            const progress = dep.savings_goal > 0 ? (Number(dep.fund_balance) / Number(dep.savings_goal)) * 100 : 0;
+
+            return (
+              <div key={dep.id} className="rounded-lg border border-border/30 bg-secondary/30 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold text-foreground">{dep.name}</p>
+                    <Badge variant="outline" className={statusStyle[dep.status] || "border-border/50"}>
+                      <StatusIcon className="h-3 w-3 mr-1" />
+                      {dep.status === "pending" ? "Pending Approval" : dep.status === "approved" ? "Approved" : "Rejected"}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{dep.relationship}</Badge>
+                  </div>
                 </div>
-                <span className="text-xs text-muted-foreground">{child.year}</span>
+                <p className="text-xs text-muted-foreground mb-1">{dep.school || "Not yet assigned"}</p>
+
+                {dep.status === "pending" && (
+                  <div className="flex items-start gap-2 p-2 mt-1 rounded-md bg-warning/5 border border-warning/15">
+                    <Clock className="h-3.5 w-3.5 text-warning mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-warning">
+                      This dependent is awaiting admin verification. Fund contributions will be enabled once approved.
+                    </p>
+                  </div>
+                )}
+
+                {dep.status === "rejected" && dep.admin_note && (
+                  <div className="flex items-start gap-2 p-2 mt-1 rounded-md bg-destructive/5 border border-destructive/15">
+                    <XCircle className="h-3.5 w-3.5 text-destructive mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-destructive">
+                      Rejected: {dep.admin_note}
+                    </p>
+                  </div>
+                )}
+
+                {isApproved && (
+                  <>
+                    <div className="flex items-center gap-3 mt-2">
+                      <Progress value={progress} className="h-2 flex-1" />
+                      <span className="text-xs font-mono text-muted-foreground shrink-0">
+                        ₦{(Number(dep.fund_balance) / 1000).toFixed(0)}K / ₦{(Number(dep.savings_goal) / 1000).toFixed(0)}K
+                      </span>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <Button variant="gold-outline" size="sm" className="text-xs flex-1">Top Up Fund</Button>
+                      <Button variant="ghost" size="sm" className="text-xs flex-1">View Details</Button>
+                    </div>
+                  </>
+                )}
               </div>
-              <p className="text-xs text-muted-foreground mb-2">{child.school}</p>
-              <div className="flex items-center gap-3">
-                <Progress value={(child.fund / child.goal) * 100} className="h-2 flex-1" />
-                <span className="text-xs font-mono text-muted-foreground shrink-0">
-                  ₦{(child.fund / 1000).toFixed(0)}K / ₦{(child.goal / 1000).toFixed(0)}K
-                </span>
-              </div>
-              <div className="flex gap-2 mt-3">
-                <Button variant="gold-outline" size="sm" className="text-xs flex-1">Top Up Fund</Button>
-                <Button variant="ghost" size="sm" className="text-xs flex-1">View Details</Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 
@@ -166,6 +225,7 @@ const EducationDashboard = () => {
               <UserPlus className="h-5 w-5 text-primary" /> Add Dependent
             </DialogTitle>
           </DialogHeader>
+          <p className="text-xs text-muted-foreground -mt-2">Your dependent will be submitted for admin verification before being activated.</p>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label className="text-xs">Full Name *</Label>
@@ -222,8 +282,8 @@ const EducationDashboard = () => {
             <DialogClose asChild>
               <Button variant="ghost" size="sm">Cancel</Button>
             </DialogClose>
-            <Button variant="gold" size="sm" onClick={handleAddDependent}>
-              <PlusCircle className="h-3.5 w-3.5" /> Add Dependent
+            <Button variant="gold" size="sm" onClick={handleAddDependent} disabled={submitting}>
+              <PlusCircle className="h-3.5 w-3.5" /> {submitting ? "Submitting…" : "Submit for Verification"}
             </Button>
           </DialogFooter>
         </DialogContent>

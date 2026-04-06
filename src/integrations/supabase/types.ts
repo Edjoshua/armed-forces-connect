@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      dependents: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          date_of_birth: string
+          fund_balance: number
+          id: string
+          name: string
+          relationship: string
+          savings_goal: number
+          school: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          date_of_birth: string
+          fund_balance?: number
+          id?: string
+          name: string
+          relationship?: string
+          savings_goal?: number
+          school?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          date_of_birth?: string
+          fund_balance?: number
+          id?: string
+          name?: string
+          relationship?: string
+          savings_goal?: number
+          school?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
