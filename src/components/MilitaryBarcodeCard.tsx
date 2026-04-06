@@ -5,22 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle2, Star, QrCode } from "lucide-react";
 
-const RANK_DISCOUNTS: Record<string, { label: string; discount: number; tier: string }> = {
-  private: { label: "Private (Pvt)", discount: 30, tier: "Platinum" },
-  corporal: { label: "Corporal (Cpl)", discount: 25, tier: "Platinum" },
-  sergeant: { label: "Sergeant (Sgt)", discount: 22, tier: "Gold" },
-  lieutenant: { label: "Lieutenant (Lt)", discount: 20, tier: "Gold" },
-  captain: { label: "Captain (Capt)", discount: 18, tier: "Silver" },
-  major: { label: "Major (Maj)", discount: 15, tier: "Silver" },
-  colonel: { label: "Colonel (Col)", discount: 12, tier: "Bronze" },
-  general: { label: "General (Gen)", discount: 10, tier: "Bronze" },
-};
-
-const TIER_COLORS: Record<string, string> = {
-  Bronze: "bg-amber-700/20 text-amber-700 border-amber-700/30",
-  Silver: "bg-muted text-muted-foreground border-border",
-  Gold: "bg-primary/10 text-primary border-primary/20",
-  Platinum: "bg-accent/10 text-accent border-accent/20",
+const RANK_DISCOUNTS: Record<string, { label: string; discount: number }> = {
+  private: { label: "Private (Pvt)", discount: 30 },
+  corporal: { label: "Corporal (Cpl)", discount: 25 },
+  sergeant: { label: "Sergeant (Sgt)", discount: 22 },
+  lieutenant: { label: "Lieutenant (Lt)", discount: 20 },
+  captain: { label: "Captain (Capt)", discount: 18 },
+  major: { label: "Major (Maj)", discount: 15 },
+  colonel: { label: "Colonel (Col)", discount: 12 },
+  general: { label: "General (Gen)", discount: 10 },
 };
 
 const MilitaryBarcodeCard = ({ onDiscountReady }: { onDiscountReady: (discount: number) => void }) => {
