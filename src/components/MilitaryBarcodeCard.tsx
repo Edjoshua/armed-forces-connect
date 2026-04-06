@@ -6,14 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle2, Star, QrCode } from "lucide-react";
 
 const RANK_DISCOUNTS: Record<string, { label: string; discount: number; tier: string }> = {
-  private: { label: "Private (Pvt)", discount: 10, tier: "Bronze" },
-  corporal: { label: "Corporal (Cpl)", discount: 12, tier: "Bronze" },
-  sergeant: { label: "Sergeant (Sgt)", discount: 15, tier: "Silver" },
-  lieutenant: { label: "Lieutenant (Lt)", discount: 18, tier: "Silver" },
-  captain: { label: "Captain (Capt)", discount: 20, tier: "Gold" },
-  major: { label: "Major (Maj)", discount: 22, tier: "Gold" },
-  colonel: { label: "Colonel (Col)", discount: 25, tier: "Platinum" },
-  general: { label: "General (Gen)", discount: 30, tier: "Platinum" },
+  private: { label: "Private (Pvt)", discount: 30, tier: "Platinum" },
+  corporal: { label: "Corporal (Cpl)", discount: 25, tier: "Platinum" },
+  sergeant: { label: "Sergeant (Sgt)", discount: 22, tier: "Gold" },
+  lieutenant: { label: "Lieutenant (Lt)", discount: 20, tier: "Gold" },
+  captain: { label: "Captain (Capt)", discount: 18, tier: "Silver" },
+  major: { label: "Major (Maj)", discount: 15, tier: "Silver" },
+  colonel: { label: "Colonel (Col)", discount: 12, tier: "Bronze" },
+  general: { label: "General (Gen)", discount: 10, tier: "Bronze" },
 };
 
 const TIER_COLORS: Record<string, string> = {
