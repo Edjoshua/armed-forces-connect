@@ -55,7 +55,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      rank_from_military_id: { Args: { mid: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
