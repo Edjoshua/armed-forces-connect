@@ -58,8 +58,17 @@ const EducationDashboard = () => {
     setLoading(false);
   };
 
+  const fetchCampaigns = async () => {
+    const { data } = await supabase
+      .from("crowdfund_campaigns")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setCampaigns(data || []);
+  };
+
   useEffect(() => {
     fetchDependents();
+    fetchCampaigns();
   }, [user]);
 
   const handleDonate = (campaignName: string) => {
