@@ -26,11 +26,6 @@ const statusIcons: Record<string, typeof Clock> = {
   rejected: XCircle,
 };
 
-const crowdfundCampaigns = [
-  { name: "CPL. Musa's Son - Medical School", raised: 850000, goal: 2000000, backers: 42, daysLeft: 18 },
-  { name: "SGT. Adamu's Daughter - Engineering", raised: 420000, goal: 1500000, backers: 28, daysLeft: 30 },
-  { name: "PVT. Okafor's Twins - Secondary School", raised: 180000, goal: 500000, backers: 15, daysLeft: 45 },
-];
 
 const contributions = [
   { date: "Mar 2026", amount: "₦50,000", type: "Personal", matched: "₦25,000" },
