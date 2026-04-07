@@ -145,7 +145,7 @@ const EducationDashboard = () => {
     } else {
       setNewCampaign({ name: "", description: "", goal: "", daysLeft: "30" });
       setShowCampaignDialog(false);
-      toast({ title: "Campaign Created!", description: "Your crowdfunding campaign is now live." });
+      toast({ title: "Campaign Submitted", description: "Your campaign has been submitted for admin approval. It will go live once approved." });
       fetchCampaigns();
     }
     setSubmitting(false);
@@ -408,7 +408,7 @@ const EducationDashboard = () => {
               <Button variant="ghost" size="sm">Cancel</Button>
             </DialogClose>
             <Button variant="gold" size="sm" onClick={handleStartCampaign} disabled={submitting}>
-              <Heart className="h-3.5 w-3.5" /> {submitting ? "Creating…" : "Launch Campaign"}
+              <Heart className="h-3.5 w-3.5" /> {submitting ? "Submitting…" : "Submit for Approval"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -449,13 +449,19 @@ const EducationDashboard = () => {
 
           {campaigns.map((c) => {
             const isOwner = user?.id === c.user_id;
+            const isPending = c.status === "pending";
             const progress = c.goal > 0 ? (Number(c.raised) / Number(c.goal)) * 100 : 0;
             return (
               <div key={c.id} className="rounded-lg border border-border/30 bg-secondary/30 p-4">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-sm font-semibold text-foreground">{c.name}</p>
                   <div className="flex items-center gap-2">
-                    {isOwner && (
+                    {isOwner && isPending && (
+                      <Badge variant="outline" className="text-[10px] bg-warning/10 text-warning border-warning/20">
+                        <Clock className="h-3 w-3 mr-1" /> Pending Approval
+                      </Badge>
+                    )}
+                    {isOwner && !isPending && (
                       <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">My Campaign</Badge>
                     )}
                     <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">
@@ -466,6 +472,16 @@ const EducationDashboard = () => {
                 {c.description && (
                   <p className="text-xs text-muted-foreground mb-2">{c.description}</p>
                 )}
+
+                {isOwner && isPending && (
+                  <div className="flex items-start gap-2 p-2 mb-2 rounded-md bg-warning/5 border border-warning/15">
+                    <Clock className="h-3.5 w-3.5 text-warning mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-warning">
+                      This campaign is awaiting admin approval. It will become visible to others once approved.
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-3 mb-2">
                   <Progress value={progress} className="h-2 flex-1" />
                   <span className="text-xs font-mono text-muted-foreground shrink-0">
