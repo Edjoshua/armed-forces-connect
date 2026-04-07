@@ -107,6 +107,18 @@ const EducationDashboard = () => {
     setSubmitting(false);
   };
 
+  const handleWithdraw = async (depId: string, depName: string) => {
+    const confirmed = window.confirm(`Withdraw approval request for ${depName}? This will remove the dependent.`);
+    if (!confirmed) return;
+    const { error } = await supabase.from("dependents").delete().eq("id", depId);
+    if (error) {
+      toast({ title: "Error", description: "Failed to withdraw. Please try again.", variant: "destructive" });
+    } else {
+      toast({ title: "Withdrawn", description: `${depName} has been removed.` });
+      fetchDependents();
+    }
+  };
+
   const approvedCount = dependents.filter((d) => d.status === "approved").length;
   const pendingCount = dependents.filter((d) => d.status === "pending").length;
   const totalFund = dependents.reduce((sum: number, d: any) => sum + Number(d.fund_balance || 0), 0);
