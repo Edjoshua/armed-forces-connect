@@ -127,6 +127,43 @@ const EducationDashboard = () => {
     }
   };
 
+  const handleStartCampaign = async () => {
+    if (!user) return;
+    if (!newCampaign.name.trim()) {
+      toast({ title: "Missing info", description: "Please enter a campaign name", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from("crowdfund_campaigns").insert({
+      user_id: user.id,
+      name: newCampaign.name.trim(),
+      description: newCampaign.description.trim() || null,
+      goal: Number(newCampaign.goal) || 500000,
+      days_left: Number(newCampaign.daysLeft) || 30,
+    });
+    if (error) {
+      toast({ title: "Error", description: "Failed to create campaign. Please try again.", variant: "destructive" });
+    } else {
+      setNewCampaign({ name: "", description: "", goal: "", daysLeft: "30" });
+      setShowCampaignDialog(false);
+      toast({ title: "Campaign Created!", description: "Your crowdfunding campaign is now live." });
+      fetchCampaigns();
+    }
+    setSubmitting(false);
+  };
+
+  const handleWithdrawCampaign = async (campaignId: string, campaignName: string) => {
+    const confirmed = window.confirm(`Withdraw campaign "${campaignName}"? This will remove it permanently.`);
+    if (!confirmed) return;
+    const { error } = await supabase.from("crowdfund_campaigns").delete().eq("id", campaignId);
+    if (error) {
+      toast({ title: "Error", description: "Failed to withdraw campaign.", variant: "destructive" });
+    } else {
+      toast({ title: "Campaign Withdrawn", description: `"${campaignName}" has been removed.` });
+      fetchCampaigns();
+    }
+  };
+
   const approvedCount = dependents.filter((d) => d.status === "approved").length;
   const pendingCount = dependents.filter((d) => d.status === "pending").length;
   const totalFund = dependents.reduce((sum: number, d: any) => sum + Number(d.fund_balance || 0), 0);
