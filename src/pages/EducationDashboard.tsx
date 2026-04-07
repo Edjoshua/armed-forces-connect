@@ -37,10 +37,13 @@ const contributions = [
 const EducationDashboard = () => {
   const [crowdfundAmount, setCrowdfundAmount] = useState("");
   const [dependents, setDependents] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showCampaignDialog, setShowCampaignDialog] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
+  const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30" });
   const { toast } = useToast();
   const { user } = useAuth();
 
