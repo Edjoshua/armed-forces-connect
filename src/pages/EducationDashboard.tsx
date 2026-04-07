@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,11 +25,6 @@ const statusIcons: Record<string, typeof Clock> = {
   rejected: XCircle,
 };
 
-const crowdfundCampaigns = [
-  { name: "CPL. Musa's Son - Medical School", raised: 850000, goal: 2000000, backers: 42, daysLeft: 18 },
-  { name: "SGT. Adamu's Daughter - Engineering", raised: 420000, goal: 1500000, backers: 28, daysLeft: 30 },
-  { name: "PVT. Okafor's Twins - Secondary School", raised: 180000, goal: 500000, backers: 15, daysLeft: 45 },
-];
 
 const contributions = [
   { date: "Mar 2026", amount: "₦50,000", type: "Personal", matched: "₦25,000" },
@@ -41,10 +36,13 @@ const contributions = [
 const EducationDashboard = () => {
   const [crowdfundAmount, setCrowdfundAmount] = useState("");
   const [dependents, setDependents] = useState<any[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showCampaignDialog, setShowCampaignDialog] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
+  const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30" });
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -59,8 +57,17 @@ const EducationDashboard = () => {
     setLoading(false);
   };
 
+  const fetchCampaigns = async () => {
+    const { data } = await supabase
+      .from("crowdfund_campaigns")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setCampaigns(data || []);
+  };
+
   useEffect(() => {
     fetchDependents();
+    fetchCampaigns();
   }, [user]);
 
   const handleDonate = (campaignName: string) => {
@@ -116,6 +123,43 @@ const EducationDashboard = () => {
     } else {
       toast({ title: "Withdrawn", description: `${depName} has been removed.` });
       fetchDependents();
+    }
+  };
+
+  const handleStartCampaign = async () => {
+    if (!user) return;
+    if (!newCampaign.name.trim()) {
+      toast({ title: "Missing info", description: "Please enter a campaign name", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from("crowdfund_campaigns").insert({
+      user_id: user.id,
+      name: newCampaign.name.trim(),
+      description: newCampaign.description.trim() || null,
+      goal: Number(newCampaign.goal) || 500000,
+      days_left: Number(newCampaign.daysLeft) || 30,
+    });
+    if (error) {
+      toast({ title: "Error", description: "Failed to create campaign. Please try again.", variant: "destructive" });
+    } else {
+      setNewCampaign({ name: "", description: "", goal: "", daysLeft: "30" });
+      setShowCampaignDialog(false);
+      toast({ title: "Campaign Created!", description: "Your crowdfunding campaign is now live." });
+      fetchCampaigns();
+    }
+    setSubmitting(false);
+  };
+
+  const handleWithdrawCampaign = async (campaignId: string, campaignName: string) => {
+    const confirmed = window.confirm(`Withdraw campaign "${campaignName}"? This will remove it permanently.`);
+    if (!confirmed) return;
+    const { error } = await supabase.from("crowdfund_campaigns").delete().eq("id", campaignId);
+    if (error) {
+      toast({ title: "Error", description: "Failed to withdraw campaign.", variant: "destructive" });
+    } else {
+      toast({ title: "Campaign Withdrawn", description: `"${campaignName}" has been removed.` });
+      fetchCampaigns();
     }
   };
 
@@ -306,6 +350,70 @@ const EducationDashboard = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Start Campaign Dialog */}
+      <Dialog open={showCampaignDialog} onOpenChange={setShowCampaignDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-destructive" /> Start Crowdfunding Campaign
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-muted-foreground -mt-2">Create a campaign to raise funds for your dependent's education.</p>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label className="text-xs">Campaign Name *</Label>
+              <Input
+                placeholder="e.g. My Son's Medical School Fund"
+                value={newCampaign.name}
+                onChange={(e) => setNewCampaign((p) => ({ ...p, name: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Description</Label>
+              <Input
+                placeholder="Brief description of why you need support"
+                value={newCampaign.description}
+                onChange={(e) => setNewCampaign((p) => ({ ...p, description: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Fundraising Goal (₦)</Label>
+              <Input
+                type="number"
+                placeholder="e.g. 2000000"
+                value={newCampaign.goal}
+                onChange={(e) => setNewCampaign((p) => ({ ...p, goal: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Campaign Duration (days)</Label>
+              <Select value={newCampaign.daysLeft} onValueChange={(v) => setNewCampaign((p) => ({ ...p, daysLeft: v }))}>
+                <SelectTrigger className="bg-secondary/50 border-border/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15">15 days</SelectItem>
+                  <SelectItem value="30">30 days</SelectItem>
+                  <SelectItem value="45">45 days</SelectItem>
+                  <SelectItem value="60">60 days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="ghost" size="sm">Cancel</Button>
+            </DialogClose>
+            <Button variant="gold" size="sm" onClick={handleStartCampaign} disabled={submitting}>
+              <Heart className="h-3.5 w-3.5" /> {submitting ? "Creating…" : "Launch Campaign"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Crowdfunding Section */}
       <Card className="border-border/50 bg-card/80">
         <CardHeader className="pb-3">
@@ -313,7 +421,9 @@ const EducationDashboard = () => {
             <CardTitle className="text-base flex items-center gap-2">
               <Heart className="h-4 w-4 text-destructive" /> Education Crowdfunding
             </CardTitle>
-            <Button variant="gold-outline" size="sm"><PlusCircle className="h-3.5 w-3.5" /> Start Campaign</Button>
+            <Button variant="gold-outline" size="sm" onClick={() => setShowCampaignDialog(true)}>
+              <PlusCircle className="h-3.5 w-3.5" /> Start Campaign
+            </Button>
           </div>
           <p className="text-xs text-muted-foreground">Support fellow servicemen's children's education</p>
         </CardHeader>
@@ -328,31 +438,60 @@ const EducationDashboard = () => {
               className="bg-secondary/50 border-border/50"
             />
           </div>
-          {crowdfundCampaigns.map((c, i) => (
-            <div key={i} className="rounded-lg border border-border/30 bg-secondary/30 p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-semibold text-foreground">{c.name}</p>
-                <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">
-                  {c.daysLeft} days left
-                </Badge>
-              </div>
-              <div className="flex items-center gap-3 mb-2">
-                <Progress value={(c.raised / c.goal) * 100} className="h-2 flex-1" />
-                <span className="text-xs font-mono text-muted-foreground shrink-0">
-                  {Math.round((c.raised / c.goal) * 100)}%
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {c.backers} backers</span>
-                  <span>₦{(c.raised / 1000).toFixed(0)}K raised</span>
-                </div>
-                <Button variant="gold" size="sm" className="text-xs" onClick={() => handleDonate(c.name)}>
-                  <Heart className="h-3 w-3" /> Donate
-                </Button>
-              </div>
+
+          {campaigns.length === 0 && (
+            <div className="text-center py-8 rounded-lg border border-dashed border-border/50">
+              <Heart className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm font-medium text-muted-foreground">No active campaigns</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a crowdfunding campaign</p>
             </div>
-          ))}
+          )}
+
+          {campaigns.map((c) => {
+            const isOwner = user?.id === c.user_id;
+            const progress = c.goal > 0 ? (Number(c.raised) / Number(c.goal)) * 100 : 0;
+            return (
+              <div key={c.id} className="rounded-lg border border-border/30 bg-secondary/30 p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-semibold text-foreground">{c.name}</p>
+                  <div className="flex items-center gap-2">
+                    {isOwner && (
+                      <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">My Campaign</Badge>
+                    )}
+                    <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">
+                      {c.days_left} days left
+                    </Badge>
+                  </div>
+                </div>
+                {c.description && (
+                  <p className="text-xs text-muted-foreground mb-2">{c.description}</p>
+                )}
+                <div className="flex items-center gap-3 mb-2">
+                  <Progress value={progress} className="h-2 flex-1" />
+                  <span className="text-xs font-mono text-muted-foreground shrink-0">
+                    {Math.round(progress)}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {c.backers} backers</span>
+                    <span>₦{(Number(c.raised) / 1000).toFixed(0)}K raised</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {isOwner ? (
+                      <Button variant="destructive" size="sm" className="text-xs" onClick={() => handleWithdrawCampaign(c.id, c.name)}>
+                        <Trash2 className="h-3 w-3" /> Withdraw
+                      </Button>
+                    ) : (
+                      <Button variant="gold" size="sm" className="text-xs" onClick={() => handleDonate(c.name)}>
+                        <Heart className="h-3 w-3" /> Donate
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
 

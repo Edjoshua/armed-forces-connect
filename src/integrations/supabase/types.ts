@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      crowdfund_campaigns: {
+        Row: {
+          backers: number
+          created_at: string
+          days_left: number
+          description: string | null
+          goal: number
+          id: string
+          name: string
+          raised: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backers?: number
+          created_at?: string
+          days_left?: number
+          description?: string | null
+          goal?: number
+          id?: string
+          name: string
+          raised?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backers?: number
+          created_at?: string
+          days_left?: number
+          description?: string | null
+          goal?: number
+          id?: string
+          name?: string
+          raised?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       dependents: {
         Row: {
           admin_note: string | null
