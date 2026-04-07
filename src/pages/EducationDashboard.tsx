@@ -192,11 +192,16 @@ const EducationDashboard = () => {
                 <p className="text-xs text-muted-foreground mb-1">{dep.school || "Not yet assigned"}</p>
 
                 {dep.status === "pending" && (
-                  <div className="flex items-start gap-2 p-2 mt-1 rounded-md bg-warning/5 border border-warning/15">
-                    <Clock className="h-3.5 w-3.5 text-warning mt-0.5 shrink-0" />
-                    <p className="text-[11px] text-warning">
-                      This dependent is awaiting admin verification. Fund contributions will be enabled once approved.
-                    </p>
+                  <div className="space-y-2 mt-1">
+                    <div className="flex items-start gap-2 p-2 rounded-md bg-warning/5 border border-warning/15">
+                      <Clock className="h-3.5 w-3.5 text-warning mt-0.5 shrink-0" />
+                      <p className="text-[11px] text-warning">
+                        This dependent is awaiting admin verification. Fund contributions will be enabled once approved.
+                      </p>
+                    </div>
+                    <Button variant="destructive" size="sm" className="text-xs" onClick={() => handleWithdraw(dep.id, dep.name)}>
+                      <XCircle className="h-3 w-3" /> Withdraw Request
+                    </Button>
                   </div>
                 )}
 
