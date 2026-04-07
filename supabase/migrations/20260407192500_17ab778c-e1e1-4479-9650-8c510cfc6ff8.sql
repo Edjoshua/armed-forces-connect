@@ -1,0 +1,1 @@
+ALTER TABLE public.crowdfund_campaigns ALTER COLUMN status SET DEFAULT 'pending';
