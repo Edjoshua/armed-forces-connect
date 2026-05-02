@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle, Trash2, Share2, Award, Target, CalendarDays, Sparkles, FileText } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
