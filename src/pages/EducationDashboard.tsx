@@ -79,11 +79,6 @@ const EducationDashboard = () => {
     setCampaigns(data || []);
   };
 
-  useEffect(() => {
-    fetchDependents();
-    fetchCampaigns();
-  }, [user]);
-
   const fetchScholarships = async () => {
     if (!user) return;
     const { data } = await supabase
