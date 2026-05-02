@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle, Trash2, Share2, Award, Target, CalendarDays, Sparkles, FileText } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,16 +34,29 @@ const contributions = [
   { date: "Dec 2025", amount: "₦50,000", type: "Personal", matched: "₦25,000" },
 ];
 
+const NIGERIAN_SCHOLARSHIPS = [
+  { name: "Federal Govt. Scholarship Award (FSB)", provider: "Federal Scholarship Board", amount: 750000, level: "Undergraduate", deadline: "Rolling" },
+  { name: "PTDF Scholarship Scheme", provider: "Petroleum Technology Dev. Fund", amount: 2500000, level: "Postgraduate", deadline: "Q2" },
+  { name: "NNPC/SNEPCo National University Scholarship", provider: "NNPC", amount: 350000, level: "Undergraduate", deadline: "Annual" },
+  { name: "Nigerian Army Education Trust", provider: "Nigerian Army", amount: 500000, level: "All Levels", deadline: "Open" },
+  { name: "MTN Foundation Scholarship", provider: "MTN Foundation", amount: 200000, level: "Undergraduate", deadline: "Q3" },
+  { name: "Agbami Medical & Engineering Scholarship", provider: "Agbami Partners", amount: 400000, level: "Undergraduate", deadline: "Q1" },
+];
+
 const EducationDashboard = () => {
   const [crowdfundAmount, setCrowdfundAmount] = useState("");
   const [dependents, setDependents] = useState<any[]>([]);
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [scholarships, setScholarships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCampaignDialog, setShowCampaignDialog] = useState(false);
+  const [showScholarshipDialog, setShowScholarshipDialog] = useState(false);
+  const [selectedScholarship, setSelectedScholarship] = useState<typeof NIGERIAN_SCHOLARSHIPS[number] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
   const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30" });
+  const [newApplication, setNewApplication] = useState({ applicantName: "", institution: "", course: "", level: "undergraduate", amount: "", reason: "" });
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -65,10 +79,75 @@ const EducationDashboard = () => {
     setCampaigns(data || []);
   };
 
+  const fetchScholarships = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("scholarship_applications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    setScholarships(data || []);
+  };
+
   useEffect(() => {
     fetchDependents();
     fetchCampaigns();
+    fetchScholarships();
   }, [user]);
+
+  const handleShare = async (campaignName: string) => {
+    const text = `Support "${campaignName}" — an education crowdfunding campaign for a serviceman's family.`;
+    if (navigator.share) {
+      try { await navigator.share({ title: campaignName, text }); return; } catch {}
+    }
+    await navigator.clipboard.writeText(text);
+    toast({ title: "Link copied", description: "Share it with friends and family to spread the word." });
+  };
+
+  const openScholarshipApply = (s: typeof NIGERIAN_SCHOLARSHIPS[number]) => {
+    setSelectedScholarship(s);
+    setNewApplication({ applicantName: "", institution: "", course: "", level: s.level.toLowerCase().includes("post") ? "postgraduate" : "undergraduate", amount: String(s.amount), reason: "" });
+    setShowScholarshipDialog(true);
+  };
+
+  const handleSubmitScholarship = async () => {
+    if (!user || !selectedScholarship) return;
+    if (!newApplication.applicantName.trim() || !newApplication.institution.trim() || !newApplication.course.trim()) {
+      toast({ title: "Missing info", description: "Please complete the required fields.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from("scholarship_applications").insert({
+      user_id: user.id,
+      scholarship_name: selectedScholarship.name,
+      applicant_name: newApplication.applicantName.trim(),
+      institution: newApplication.institution.trim(),
+      course_of_study: newApplication.course.trim(),
+      level: newApplication.level,
+      amount_requested: Number(newApplication.amount) || 0,
+      reason: newApplication.reason.trim() || null,
+    });
+    if (error) {
+      toast({ title: "Error", description: "Failed to submit application.", variant: "destructive" });
+    } else {
+      setShowScholarshipDialog(false);
+      setSelectedScholarship(null);
+      toast({ title: "Application Submitted", description: "Your scholarship application is pending admin verification." });
+      fetchScholarships();
+    }
+    setSubmitting(false);
+  };
+
+  const handleWithdrawScholarship = async (id: string, name: string) => {
+    if (!window.confirm(`Withdraw your application for "${name}"?`)) return;
+    const { error } = await supabase.from("scholarship_applications").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: "Could not withdraw application.", variant: "destructive" });
+    } else {
+      toast({ title: "Withdrawn", description: "Application removed." });
+      fetchScholarships();
+    }
+  };
 
   const handleDonate = (campaignName: string) => {
     if (!crowdfundAmount || Number(crowdfundAmount) <= 0) {
@@ -414,102 +493,288 @@ const EducationDashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Crowdfunding Section */}
-      <Card className="border-border/50 bg-card/80">
+      {/* Crowdfunding Section — GoFundMe style */}
+      <Card className="border-border/50 bg-card/80 overflow-hidden">
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Heart className="h-4 w-4 text-destructive" /> Education Crowdfunding
-            </CardTitle>
-            <Button variant="gold-outline" size="sm" onClick={() => setShowCampaignDialog(true)}>
-              <PlusCircle className="h-3.5 w-3.5" /> Start Campaign
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Heart className="h-4 w-4 text-destructive fill-destructive/30" /> Education Crowdfunding
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">Help fellow servicemen raise funds for their children's education</p>
+            </div>
+            <Button variant="gold" size="sm" onClick={() => setShowCampaignDialog(true)}>
+              <PlusCircle className="h-3.5 w-3.5" /> Start a Campaign
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">Support fellow servicemen's children's education</p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2 mb-4">
-            <Label className="text-xs">Donation Amount (₦)</Label>
-            <Input
-              type="number"
-              placeholder="Enter amount to donate"
-              value={crowdfundAmount}
-              onChange={(e) => setCrowdfundAmount(e.target.value)}
-              className="bg-secondary/50 border-border/50"
-            />
-          </div>
-
           {campaigns.length === 0 && (
-            <div className="text-center py-8 rounded-lg border border-dashed border-border/50">
+            <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
               <Heart className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-              <p className="text-sm font-medium text-muted-foreground">No active campaigns</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a crowdfunding campaign</p>
+              <p className="text-sm font-medium text-muted-foreground">No active campaigns yet</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a fundraiser — every contribution counts.</p>
             </div>
           )}
 
-          {campaigns.map((c) => {
-            const isOwner = user?.id === c.user_id;
-            const isPending = c.status === "pending";
-            const progress = c.goal > 0 ? (Number(c.raised) / Number(c.goal)) * 100 : 0;
-            return (
-              <div key={c.id} className="rounded-lg border border-border/30 bg-secondary/30 p-4">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-sm font-semibold text-foreground">{c.name}</p>
-                  <div className="flex items-center gap-2">
-                    {isOwner && isPending && (
-                      <Badge variant="outline" className="text-[10px] bg-warning/10 text-warning border-warning/20">
-                        <Clock className="h-3 w-3 mr-1" /> Pending Approval
+          <div className="grid gap-4 md:grid-cols-2">
+            {campaigns.map((c) => {
+              const isOwner = user?.id === c.user_id;
+              const isPending = c.status === "pending";
+              const goal = Number(c.goal) || 1;
+              const raised = Number(c.raised) || 0;
+              const progress = Math.min(100, (raised / goal) * 100);
+              return (
+                <div key={c.id} className="rounded-xl border border-border/40 bg-secondary/20 overflow-hidden flex flex-col hover:border-primary/30 transition-colors">
+                  {/* Hero strip */}
+                  <div className="relative h-24 bg-gradient-to-br from-primary/30 via-destructive/20 to-primary/10 flex items-center justify-center">
+                    <Heart className="h-10 w-10 text-primary-foreground/80 fill-primary/40" />
+                    <div className="absolute top-2 right-2 flex flex-wrap gap-1 justify-end">
+                      {isOwner && isPending && (
+                        <Badge variant="outline" className="text-[10px] bg-warning/90 text-warning-foreground border-warning/40 backdrop-blur">
+                          <Clock className="h-3 w-3 mr-1" /> Pending
+                        </Badge>
+                      )}
+                      {isOwner && !isPending && (
+                        <Badge variant="outline" className="text-[10px] bg-primary/90 text-primary-foreground border-primary/40 backdrop-blur">My Campaign</Badge>
+                      )}
+                    </div>
+                    <div className="absolute bottom-2 left-2">
+                      <Badge variant="outline" className="text-[10px] bg-background/70 border-border/50 backdrop-blur">
+                        <CalendarDays className="h-3 w-3 mr-1" /> {c.days_left} days left
                       </Badge>
-                    )}
-                    {isOwner && !isPending && (
-                      <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">My Campaign</Badge>
-                    )}
-                    <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">
-                      {c.days_left} days left
-                    </Badge>
+                    </div>
                   </div>
-                </div>
-                {c.description && (
-                  <p className="text-xs text-muted-foreground mb-2">{c.description}</p>
-                )}
 
-                {isOwner && isPending && (
-                  <div className="flex items-start gap-2 p-2 mb-2 rounded-md bg-warning/5 border border-warning/15">
-                    <Clock className="h-3.5 w-3.5 text-warning mt-0.5 shrink-0" />
-                    <p className="text-[11px] text-warning">
-                      This campaign is awaiting admin approval. It will become visible to others once approved.
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex items-center gap-3 mb-2">
-                  <Progress value={progress} className="h-2 flex-1" />
-                  <span className="text-xs font-mono text-muted-foreground shrink-0">
-                    {Math.round(progress)}%
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {c.backers} backers</span>
-                    <span>₦{(Number(c.raised) / 1000).toFixed(0)}K raised</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {isOwner ? (
-                      <Button variant="destructive" size="sm" className="text-xs" onClick={() => handleWithdrawCampaign(c.id, c.name)}>
-                        <Trash2 className="h-3 w-3" /> Withdraw
-                      </Button>
-                    ) : (
-                      <Button variant="gold" size="sm" className="text-xs" onClick={() => handleDonate(c.name)}>
-                        <Heart className="h-3 w-3" /> Donate
-                      </Button>
+                  <div className="p-4 flex-1 flex flex-col">
+                    <p className="text-sm font-semibold text-foreground line-clamp-2">{c.name}</p>
+                    {c.description && (
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-3">{c.description}</p>
                     )}
+
+                    {isOwner && isPending && (
+                      <div className="flex items-start gap-2 p-2 mt-3 rounded-md bg-warning/5 border border-warning/15">
+                        <Clock className="h-3.5 w-3.5 text-warning mt-0.5 shrink-0" />
+                        <p className="text-[11px] text-warning">
+                          Awaiting admin approval. Your campaign will go live once verified.
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="mt-3 space-y-1">
+                      <Progress value={progress} className="h-2" />
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-mono font-semibold text-foreground">₦{raised.toLocaleString()}</span>
+                        <span className="text-muted-foreground">of ₦{goal.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-2">
+                      <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {c.backers} backers</span>
+                      <span className="flex items-center gap-1"><Target className="h-3 w-3" /> {Math.round(progress)}% funded</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 mt-4">
+                      {isOwner ? (
+                        <Button variant="destructive" size="sm" className="text-xs flex-1" onClick={() => handleWithdrawCampaign(c.id, c.name)}>
+                          <Trash2 className="h-3 w-3" /> Withdraw
+                        </Button>
+                      ) : (
+                        <>
+                          <Button variant="gold" size="sm" className="text-xs flex-1" onClick={() => handleDonate(c.name)} disabled={isPending}>
+                            <Heart className="h-3 w-3" /> Donate
+                          </Button>
+                          <Button variant="outline" size="sm" className="text-xs" onClick={() => handleShare(c.name)}>
+                            <Share2 className="h-3 w-3" /> Share
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {campaigns.some((c) => c.status === "active" && c.user_id !== user?.id) && (
+            <div className="rounded-lg border border-border/40 bg-secondary/30 p-3 space-y-2">
+              <Label className="text-xs flex items-center gap-1"><Sparkles className="h-3 w-3 text-primary" /> Quick donation amount (₦)</Label>
+              <Input
+                type="number"
+                placeholder="Enter amount before tapping Donate"
+                value={crowdfundAmount}
+                onChange={(e) => setCrowdfundAmount(e.target.value)}
+                className="bg-background border-border/50"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Nigerian Scholarships Section */}
+      <Card className="border-border/50 bg-card/80">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Award className="h-4 w-4 text-primary" /> Nigerian Scholarships
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">Apply for funded scholarships available to military personnel and dependents. All applications are verified by an admin.</p>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {/* My applications */}
+          {scholarships.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">My Applications</p>
+              <div className="space-y-2">
+                {scholarships.map((app) => {
+                  const StatusIcon = statusIcons[app.status] || Clock;
+                  return (
+                    <div key={app.id} className="rounded-lg border border-border/30 bg-secondary/30 p-3">
+                      <div className="flex items-start justify-between gap-2 flex-wrap">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-foreground">{app.scholarship_name}</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            {app.applicant_name} · {app.institution} · ₦{Number(app.amount_requested).toLocaleString()}
+                          </p>
+                        </div>
+                        <Badge variant="outline" className={statusStyle[app.status] || "border-border/50"}>
+                          <StatusIcon className="h-3 w-3 mr-1" />
+                          {app.status === "pending" ? "Pending Review" : app.status === "approved" ? "Approved" : "Rejected"}
+                        </Badge>
+                      </div>
+                      {app.status === "rejected" && app.admin_note && (
+                        <p className="text-[11px] text-destructive mt-2">Note: {app.admin_note}</p>
+                      )}
+                      {app.status === "pending" && (
+                        <Button variant="ghost" size="sm" className="text-xs mt-2 h-7" onClick={() => handleWithdrawScholarship(app.id, app.scholarship_name)}>
+                          <XCircle className="h-3 w-3" /> Withdraw application
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Available scholarships */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Available Scholarships</p>
+            <div className="grid gap-3 md:grid-cols-2">
+              {NIGERIAN_SCHOLARSHIPS.map((s) => (
+                <div key={s.name} className="rounded-lg border border-border/30 bg-secondary/30 p-4 hover:border-primary/40 transition-colors flex flex-col">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                      <Award className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-foreground leading-tight">{s.name}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{s.provider}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">{s.level}</Badge>
+                    <Badge variant="outline" className="text-[10px] border-border/50 text-muted-foreground">
+                      <CalendarDays className="h-3 w-3 mr-1" /> {s.deadline}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/20">
+                      Up to ₦{(s.amount / 1000).toLocaleString()}K
+                    </Badge>
+                  </div>
+                  <Button variant="gold-outline" size="sm" className="text-xs mt-4" onClick={() => openScholarshipApply(s)}>
+                    <FileText className="h-3 w-3" /> Apply Now
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Scholarship Application Dialog */}
+      <Dialog open={showScholarshipDialog} onOpenChange={setShowScholarshipDialog}>
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Award className="h-5 w-5 text-primary" /> Apply for Scholarship
+            </DialogTitle>
+          </DialogHeader>
+          {selectedScholarship && (
+            <div className="rounded-md border border-border/40 bg-secondary/30 p-3 -mt-2">
+              <p className="text-sm font-semibold text-foreground">{selectedScholarship.name}</p>
+              <p className="text-[11px] text-muted-foreground">{selectedScholarship.provider} · {selectedScholarship.level}</p>
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">Submitted applications are reviewed and verified by an admin before approval.</p>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label className="text-xs">Applicant Name *</Label>
+              <Input
+                placeholder="Full name of the applicant"
+                value={newApplication.applicantName}
+                onChange={(e) => setNewApplication((p) => ({ ...p, applicantName: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Institution *</Label>
+              <Input
+                placeholder="e.g. University of Lagos"
+                value={newApplication.institution}
+                onChange={(e) => setNewApplication((p) => ({ ...p, institution: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Course of Study *</Label>
+              <Input
+                placeholder="e.g. Mechanical Engineering"
+                value={newApplication.course}
+                onChange={(e) => setNewApplication((p) => ({ ...p, course: e.target.value }))}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-xs">Level</Label>
+                <Select value={newApplication.level} onValueChange={(v) => setNewApplication((p) => ({ ...p, level: v }))}>
+                  <SelectTrigger className="bg-secondary/50 border-border/50"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="undergraduate">Undergraduate</SelectItem>
+                    <SelectItem value="postgraduate">Postgraduate</SelectItem>
+                    <SelectItem value="secondary">Secondary</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">Amount (₦)</Label>
+                <Input
+                  type="number"
+                  value={newApplication.amount}
+                  onChange={(e) => setNewApplication((p) => ({ ...p, amount: e.target.value }))}
+                  className="bg-secondary/50 border-border/50"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Reason for Application</Label>
+              <Textarea
+                placeholder="Briefly explain why you qualify and need this scholarship"
+                value={newApplication.reason}
+                onChange={(e) => setNewApplication((p) => ({ ...p, reason: e.target.value }))}
+                className="bg-secondary/50 border-border/50 min-h-[80px]"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="ghost" size="sm">Cancel</Button>
+            </DialogClose>
+            <Button variant="gold" size="sm" onClick={handleSubmitScholarship} disabled={submitting}>
+              <FileText className="h-3.5 w-3.5" /> {submitting ? "Submitting…" : "Submit Application"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Contribution History */}
       <Card className="border-border/50 bg-card/80">
