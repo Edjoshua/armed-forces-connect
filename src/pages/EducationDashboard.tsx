@@ -84,6 +84,76 @@ const EducationDashboard = () => {
     fetchCampaigns();
   }, [user]);
 
+  const fetchScholarships = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("scholarship_applications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    setScholarships(data || []);
+  };
+
+  useEffect(() => {
+    fetchDependents();
+    fetchCampaigns();
+    fetchScholarships();
+  }, [user]);
+
+  const handleShare = async (campaignName: string) => {
+    const text = `Support "${campaignName}" — an education crowdfunding campaign for a serviceman's family.`;
+    if (navigator.share) {
+      try { await navigator.share({ title: campaignName, text }); return; } catch {}
+    }
+    await navigator.clipboard.writeText(text);
+    toast({ title: "Link copied", description: "Share it with friends and family to spread the word." });
+  };
+
+  const openScholarshipApply = (s: typeof NIGERIAN_SCHOLARSHIPS[number]) => {
+    setSelectedScholarship(s);
+    setNewApplication({ applicantName: "", institution: "", course: "", level: s.level.toLowerCase().includes("post") ? "postgraduate" : "undergraduate", amount: String(s.amount), reason: "" });
+    setShowScholarshipDialog(true);
+  };
+
+  const handleSubmitScholarship = async () => {
+    if (!user || !selectedScholarship) return;
+    if (!newApplication.applicantName.trim() || !newApplication.institution.trim() || !newApplication.course.trim()) {
+      toast({ title: "Missing info", description: "Please complete the required fields.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.from("scholarship_applications").insert({
+      user_id: user.id,
+      scholarship_name: selectedScholarship.name,
+      applicant_name: newApplication.applicantName.trim(),
+      institution: newApplication.institution.trim(),
+      course_of_study: newApplication.course.trim(),
+      level: newApplication.level,
+      amount_requested: Number(newApplication.amount) || 0,
+      reason: newApplication.reason.trim() || null,
+    });
+    if (error) {
+      toast({ title: "Error", description: "Failed to submit application.", variant: "destructive" });
+    } else {
+      setShowScholarshipDialog(false);
+      setSelectedScholarship(null);
+      toast({ title: "Application Submitted", description: "Your scholarship application is pending admin verification." });
+      fetchScholarships();
+    }
+    setSubmitting(false);
+  };
+
+  const handleWithdrawScholarship = async (id: string, name: string) => {
+    if (!window.confirm(`Withdraw your application for "${name}"?`)) return;
+    const { error } = await supabase.from("scholarship_applications").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: "Could not withdraw application.", variant: "destructive" });
+    } else {
+      toast({ title: "Withdrawn", description: "Application removed." });
+      fetchScholarships();
+    }
+  };
+
   const handleDonate = (campaignName: string) => {
     if (!crowdfundAmount || Number(crowdfundAmount) <= 0) {
       toast({ title: "Enter amount", description: "Please enter a donation amount", variant: "destructive" });
