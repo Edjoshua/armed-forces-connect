@@ -527,8 +527,8 @@ const EducationDashboard = () => {
               return (
                 <div key={c.id} className="rounded-xl border border-border/40 bg-secondary/20 overflow-hidden flex flex-col hover:border-primary/30 transition-colors">
                   {/* Hero strip */}
-                  <div className="relative h-24 bg-gradient-to-br from-primary/30 via-destructive/20 to-primary/10 flex items-center justify-center">
-                    <Heart className="h-10 w-10 text-primary-foreground/80 fill-primary/40" />
+                  <div className="relative h-24 bg-gradient-to-br from-destructive/30 via-destructive/20 to-primary/10 flex items-center justify-center">
+                    <HeartPulse className="h-10 w-10 text-destructive/80" />
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1 justify-end">
                       {isOwner && isPending && (
                         <Badge variant="outline" className="text-[10px] bg-warning/90 text-warning-foreground border-warning/40 backdrop-blur">
