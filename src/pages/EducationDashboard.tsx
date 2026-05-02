@@ -96,7 +96,7 @@ const EducationDashboard = () => {
   }, [user]);
 
   const handleShare = async (campaignName: string) => {
-    const text = `Support "${campaignName}" — an education crowdfunding campaign for a serviceman's family.`;
+    const text = `Support "${campaignName}" — a medical fundraiser for a serviceman's family. Every donation helps cover treatment costs.`;
     if (navigator.share) {
       try { await navigator.share({ title: campaignName, text }); return; } catch {}
     }
