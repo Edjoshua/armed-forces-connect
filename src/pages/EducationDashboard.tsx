@@ -499,21 +499,21 @@ const EducationDashboard = () => {
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <Heart className="h-4 w-4 text-destructive fill-destructive/30" /> Education Crowdfunding
+                <HeartPulse className="h-4 w-4 text-destructive" /> Medical Crowdfunding
               </CardTitle>
-              <p className="text-xs text-muted-foreground mt-1">Help fellow servicemen raise funds for their children's education</p>
+              <p className="text-xs text-muted-foreground mt-1">Help fellow servicemen and their families cover urgent medical costs</p>
             </div>
             <Button variant="gold" size="sm" onClick={() => setShowCampaignDialog(true)}>
-              <PlusCircle className="h-3.5 w-3.5" /> Start a Campaign
+              <PlusCircle className="h-3.5 w-3.5" /> Start Fundraiser
             </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {campaigns.length === 0 && (
             <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
-              <Heart className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-              <p className="text-sm font-medium text-muted-foreground">No active campaigns yet</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a fundraiser — every contribution counts.</p>
+              <Stethoscope className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm font-medium text-muted-foreground">No active medical fundraisers yet</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a fundraiser — every contribution helps save lives.</p>
             </div>
           )}
 
