@@ -137,6 +137,54 @@ export type Database = {
         }
         Relationships: []
       }
+      scholarship_applications: {
+        Row: {
+          admin_note: string | null
+          amount_requested: number
+          applicant_name: string
+          course_of_study: string
+          created_at: string
+          id: string
+          institution: string
+          level: string
+          reason: string | null
+          scholarship_name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount_requested?: number
+          applicant_name: string
+          course_of_study: string
+          created_at?: string
+          id?: string
+          institution: string
+          level?: string
+          reason?: string | null
+          scholarship_name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount_requested?: number
+          applicant_name?: string
+          course_of_study?: string
+          created_at?: string
+          id?: string
+          institution?: string
+          level?: string
+          reason?: string | null
+          scholarship_name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
