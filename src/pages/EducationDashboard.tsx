@@ -450,11 +450,11 @@ const EducationDashboard = () => {
             </div>
             <div className="space-y-2">
               <Label className="text-xs">Description</Label>
-              <Input
-                placeholder="Brief description of why you need support"
+              <Textarea
+                placeholder="Briefly describe the medical condition, treatment needed, and how funds will be used"
                 value={newCampaign.description}
                 onChange={(e) => setNewCampaign((p) => ({ ...p, description: e.target.value }))}
-                className="bg-secondary/50 border-border/50"
+                className="bg-secondary/50 border-border/50 min-h-[80px]"
               />
             </div>
             <div className="space-y-2">
