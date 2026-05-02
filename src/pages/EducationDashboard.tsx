@@ -34,16 +34,29 @@ const contributions = [
   { date: "Dec 2025", amount: "₦50,000", type: "Personal", matched: "₦25,000" },
 ];
 
+const NIGERIAN_SCHOLARSHIPS = [
+  { name: "Federal Govt. Scholarship Award (FSB)", provider: "Federal Scholarship Board", amount: 750000, level: "Undergraduate", deadline: "Rolling" },
+  { name: "PTDF Scholarship Scheme", provider: "Petroleum Technology Dev. Fund", amount: 2500000, level: "Postgraduate", deadline: "Q2" },
+  { name: "NNPC/SNEPCo National University Scholarship", provider: "NNPC", amount: 350000, level: "Undergraduate", deadline: "Annual" },
+  { name: "Nigerian Army Education Trust", provider: "Nigerian Army", amount: 500000, level: "All Levels", deadline: "Open" },
+  { name: "MTN Foundation Scholarship", provider: "MTN Foundation", amount: 200000, level: "Undergraduate", deadline: "Q3" },
+  { name: "Agbami Medical & Engineering Scholarship", provider: "Agbami Partners", amount: 400000, level: "Undergraduate", deadline: "Q1" },
+];
+
 const EducationDashboard = () => {
   const [crowdfundAmount, setCrowdfundAmount] = useState("");
   const [dependents, setDependents] = useState<any[]>([]);
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [scholarships, setScholarships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCampaignDialog, setShowCampaignDialog] = useState(false);
+  const [showScholarshipDialog, setShowScholarshipDialog] = useState(false);
+  const [selectedScholarship, setSelectedScholarship] = useState<typeof NIGERIAN_SCHOLARSHIPS[number] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
   const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30" });
+  const [newApplication, setNewApplication] = useState({ applicantName: "", institution: "", course: "", level: "undergraduate", amount: "", reason: "" });
   const { toast } = useToast();
   const { user } = useAuth();
 
