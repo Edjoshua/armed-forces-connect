@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle, Trash2, Share2, Award, Target, CalendarDays, Sparkles, FileText } from "lucide-react";
+import { GraduationCap, Wallet, BookOpen, TrendingUp, PlusCircle, Users, Heart, UserPlus, Clock, CheckCircle2, XCircle, Trash2, Share2, Award, Target, CalendarDays, Sparkles, FileText, HeartPulse, Stethoscope } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -96,7 +96,7 @@ const EducationDashboard = () => {
   }, [user]);
 
   const handleShare = async (campaignName: string) => {
-    const text = `Support "${campaignName}" — an education crowdfunding campaign for a serviceman's family.`;
+    const text = `Support "${campaignName}" — a medical fundraiser for a serviceman's family. Every donation helps cover treatment costs.`;
     if (navigator.share) {
       try { await navigator.share({ title: campaignName, text }); return; } catch {}
     }
@@ -434,15 +434,15 @@ const EducationDashboard = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-destructive" /> Start Crowdfunding Campaign
+              <Heart className="h-5 w-5 text-destructive" /> Start Medical Fundraiser
             </DialogTitle>
           </DialogHeader>
-          <p className="text-xs text-muted-foreground -mt-2">Create a campaign to raise funds for your dependent's education.</p>
+          <p className="text-xs text-muted-foreground -mt-2">Create a fundraiser to cover medical treatment, surgery, or recovery costs.</p>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label className="text-xs">Campaign Name *</Label>
               <Input
-                placeholder="e.g. My Son's Medical School Fund"
+                placeholder="e.g. Help Cpl. Bello's Heart Surgery"
                 value={newCampaign.name}
                 onChange={(e) => setNewCampaign((p) => ({ ...p, name: e.target.value }))}
                 className="bg-secondary/50 border-border/50"
@@ -450,11 +450,11 @@ const EducationDashboard = () => {
             </div>
             <div className="space-y-2">
               <Label className="text-xs">Description</Label>
-              <Input
-                placeholder="Brief description of why you need support"
+              <Textarea
+                placeholder="Briefly describe the medical condition, treatment needed, and how funds will be used"
                 value={newCampaign.description}
                 onChange={(e) => setNewCampaign((p) => ({ ...p, description: e.target.value }))}
-                className="bg-secondary/50 border-border/50"
+                className="bg-secondary/50 border-border/50 min-h-[80px]"
               />
             </div>
             <div className="space-y-2">
@@ -499,21 +499,21 @@ const EducationDashboard = () => {
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <Heart className="h-4 w-4 text-destructive fill-destructive/30" /> Education Crowdfunding
+                <HeartPulse className="h-4 w-4 text-destructive" /> Medical Crowdfunding
               </CardTitle>
-              <p className="text-xs text-muted-foreground mt-1">Help fellow servicemen raise funds for their children's education</p>
+              <p className="text-xs text-muted-foreground mt-1">Help fellow servicemen and their families cover urgent medical costs</p>
             </div>
             <Button variant="gold" size="sm" onClick={() => setShowCampaignDialog(true)}>
-              <PlusCircle className="h-3.5 w-3.5" /> Start a Campaign
+              <PlusCircle className="h-3.5 w-3.5" /> Start Fundraiser
             </Button>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {campaigns.length === 0 && (
             <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
-              <Heart className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-              <p className="text-sm font-medium text-muted-foreground">No active campaigns yet</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a fundraiser — every contribution counts.</p>
+              <Stethoscope className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm font-medium text-muted-foreground">No active medical fundraisers yet</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a fundraiser — every contribution helps save lives.</p>
             </div>
           )}
 
@@ -527,8 +527,8 @@ const EducationDashboard = () => {
               return (
                 <div key={c.id} className="rounded-xl border border-border/40 bg-secondary/20 overflow-hidden flex flex-col hover:border-primary/30 transition-colors">
                   {/* Hero strip */}
-                  <div className="relative h-24 bg-gradient-to-br from-primary/30 via-destructive/20 to-primary/10 flex items-center justify-center">
-                    <Heart className="h-10 w-10 text-primary-foreground/80 fill-primary/40" />
+                  <div className="relative h-24 bg-gradient-to-br from-destructive/30 via-destructive/20 to-primary/10 flex items-center justify-center">
+                    <HeartPulse className="h-10 w-10 text-destructive/80" />
                     <div className="absolute top-2 right-2 flex flex-wrap gap-1 justify-end">
                       {isOwner && isPending && (
                         <Badge variant="outline" className="text-[10px] bg-warning/90 text-warning-foreground border-warning/40 backdrop-blur">
