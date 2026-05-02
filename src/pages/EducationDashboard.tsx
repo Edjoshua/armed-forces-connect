@@ -434,15 +434,15 @@ const EducationDashboard = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-destructive" /> Start Crowdfunding Campaign
+              <Heart className="h-5 w-5 text-destructive" /> Start Medical Fundraiser
             </DialogTitle>
           </DialogHeader>
-          <p className="text-xs text-muted-foreground -mt-2">Create a campaign to raise funds for your dependent's education.</p>
+          <p className="text-xs text-muted-foreground -mt-2">Create a fundraiser to cover medical treatment, surgery, or recovery costs.</p>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label className="text-xs">Campaign Name *</Label>
               <Input
-                placeholder="e.g. My Son's Medical School Fund"
+                placeholder="e.g. Help Cpl. Bello's Heart Surgery"
                 value={newCampaign.name}
                 onChange={(e) => setNewCampaign((p) => ({ ...p, name: e.target.value }))}
                 className="bg-secondary/50 border-border/50"
