@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Wallet, CreditCard, ShoppingBag, Truck, GraduationCap,
-  ClipboardCheck, Settings, LogOut, ChevronLeft, ChevronRight, Menu, X, HeadphonesIcon
+  Wallet, CreditCard, ShoppingBag, GraduationCap, HandCoins,
+  Settings, LogOut, ChevronLeft, ChevronRight, Menu, X, HeadphonesIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,9 +20,8 @@ const navItems: NavItem[] = [
   { label: "Wallet", icon: Wallet, path: "/dashboard" },
   { label: "Payments", icon: CreditCard, path: "/dashboard/payments" },
   { label: "Retail Discounts", icon: ShoppingBag, path: "/dashboard/retail" },
-  { label: "Supply Chain", icon: Truck, path: "/dashboard/supply" },
   { label: "Education Fund", icon: GraduationCap, path: "/dashboard/education" },
-  { label: "Audit & Compliance", icon: ClipboardCheck, path: "/dashboard/audit" },
+  { label: "Approved Fundings", icon: HandCoins, path: "/dashboard/approved-fundings" },
   { label: "Support", icon: HeadphonesIcon, path: "/dashboard/support" },
   { label: "Settings", icon: Settings, path: "/dashboard/settings" },
 ];
