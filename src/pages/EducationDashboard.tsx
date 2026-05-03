@@ -126,6 +126,8 @@ const EducationDashboard = () => {
       level: newApplication.level,
       amount_requested: Number(newApplication.amount) || 0,
       reason: newApplication.reason.trim() || null,
+      cgpa: newApplication.cgpa ? Number(newApplication.cgpa) : null,
+      school_year: newApplication.schoolYear.trim() || null,
     });
     if (error) {
       toast({ title: "Error", description: "Failed to submit application.", variant: "destructive" });
@@ -177,6 +179,9 @@ const EducationDashboard = () => {
       date_of_birth: newDep.dateOfBirth,
       school: newDep.school.trim() || "Not yet assigned",
       savings_goal: Number(newDep.goal) || 1000000,
+      cgpa: newDep.cgpa ? Number(newDep.cgpa) : null,
+      school_year: newDep.schoolYear.trim() || null,
+      reason: newDep.reason.trim() || null,
     });
 
     if (error) {
