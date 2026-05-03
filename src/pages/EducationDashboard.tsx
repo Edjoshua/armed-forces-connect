@@ -106,7 +106,7 @@ const EducationDashboard = () => {
 
   const openScholarshipApply = (s: typeof NIGERIAN_SCHOLARSHIPS[number]) => {
     setSelectedScholarship(s);
-    setNewApplication({ applicantName: "", institution: "", course: "", level: s.level.toLowerCase().includes("post") ? "postgraduate" : "undergraduate", amount: String(s.amount), reason: "" });
+    setNewApplication({ applicantName: "", institution: "", course: "", level: s.level.toLowerCase().includes("post") ? "postgraduate" : "undergraduate", amount: String(s.amount), reason: "", cgpa: "", schoolYear: "" });
     setShowScholarshipDialog(true);
   };
 
@@ -182,7 +182,7 @@ const EducationDashboard = () => {
     if (error) {
       toast({ title: "Error", description: "Failed to add dependent. Please try again.", variant: "destructive" });
     } else {
-      setNewDep({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
+      setNewDep({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "", cgpa: "", schoolYear: "", reason: "" });
       setShowAddDialog(false);
       toast({
         title: "Dependent Submitted",
