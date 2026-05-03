@@ -9,13 +9,12 @@ import DashboardLayout from "./components/DashboardLayout";
 import WalletDashboard from "./pages/WalletDashboard";
 import PaymentsDashboard from "./pages/PaymentsDashboard";
 import RetailDashboard from "./pages/RetailDashboard";
-import SupplyDashboard from "./pages/SupplyDashboard";
 import EducationDashboard from "./pages/EducationDashboard";
-import AuditDashboard from "./pages/AuditDashboard";
 import SettingsDashboard from "./pages/SettingsDashboard";
 import SupportDashboard from "./pages/SupportDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import TransactionHistory from "./pages/TransactionHistory";
+import ApprovedFundings from "./pages/ApprovedFundings";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -49,9 +48,8 @@ const App = () => (
               <Route index element={<WalletDashboard />} />
               <Route path="payments" element={<PaymentsDashboard />} />
               <Route path="retail" element={<RetailDashboard />} />
-              <Route path="supply" element={<SupplyDashboard />} />
               <Route path="education" element={<EducationDashboard />} />
-              <Route path="audit" element={<AuditDashboard />} />
+              <Route path="approved-fundings" element={<ApprovedFundings />} />
               <Route path="settings" element={<SettingsDashboard />} />
               <Route path="support" element={<SupportDashboard />} />
               <Route path="profile" element={<ProfilePage />} />
