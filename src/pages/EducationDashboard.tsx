@@ -421,6 +421,7 @@ const EducationDashboard = () => {
                 onChange={(e) => setNewDep((p) => ({ ...p, goal: e.target.value }))}
                 className="bg-secondary/50 border-border/50"
               />
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label className="text-xs">CGPA</Label>
