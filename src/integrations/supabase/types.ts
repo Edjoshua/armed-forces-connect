@@ -16,7 +16,10 @@ export type Database = {
     Tables: {
       crowdfund_campaigns: {
         Row: {
+          approved_at: string | null
           backers: number
+          beneficiary: string | null
+          cgpa: number | null
           created_at: string
           days_left: number
           description: string | null
@@ -24,12 +27,16 @@ export type Database = {
           id: string
           name: string
           raised: number
+          school_year: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
           backers?: number
+          beneficiary?: string | null
+          cgpa?: number | null
           created_at?: string
           days_left?: number
           description?: string | null
@@ -37,12 +44,16 @@ export type Database = {
           id?: string
           name: string
           raised?: number
+          school_year?: string | null
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          approved_at?: string | null
           backers?: number
+          beneficiary?: string | null
+          cgpa?: number | null
           created_at?: string
           days_left?: number
           description?: string | null
@@ -50,6 +61,7 @@ export type Database = {
           id?: string
           name?: string
           raised?: number
+          school_year?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -59,43 +71,91 @@ export type Database = {
       dependents: {
         Row: {
           admin_note: string | null
+          cgpa: number | null
           created_at: string
           date_of_birth: string
           fund_balance: number
           id: string
           name: string
+          reason: string | null
           relationship: string
           savings_goal: number
           school: string | null
+          school_year: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
           admin_note?: string | null
+          cgpa?: number | null
           created_at?: string
           date_of_birth: string
           fund_balance?: number
           id?: string
           name: string
+          reason?: string | null
           relationship?: string
           savings_goal?: number
           school?: string | null
+          school_year?: string | null
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           admin_note?: string | null
+          cgpa?: number | null
           created_at?: string
           date_of_birth?: string
           fund_balance?: number
           id?: string
           name?: string
+          reason?: string | null
           relationship?: string
           savings_goal?: number
           school?: string | null
+          school_year?: string | null
           status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kyc_verifications: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          face_image_path: string | null
+          id: string
+          id_card_path: string | null
+          id_type: string | null
+          status: string
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          face_image_path?: string | null
+          id?: string
+          id_card_path?: string | null
+          id_type?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          face_image_path?: string | null
+          id?: string
+          id_card_path?: string | null
+          id_type?: string | null
+          status?: string
+          submitted_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -142,6 +202,7 @@ export type Database = {
           admin_note: string | null
           amount_requested: number
           applicant_name: string
+          cgpa: number | null
           course_of_study: string
           created_at: string
           id: string
@@ -149,6 +210,7 @@ export type Database = {
           level: string
           reason: string | null
           scholarship_name: string
+          school_year: string | null
           status: string
           updated_at: string
           user_id: string
@@ -157,6 +219,7 @@ export type Database = {
           admin_note?: string | null
           amount_requested?: number
           applicant_name: string
+          cgpa?: number | null
           course_of_study: string
           created_at?: string
           id?: string
@@ -164,6 +227,7 @@ export type Database = {
           level?: string
           reason?: string | null
           scholarship_name: string
+          school_year?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -172,6 +236,7 @@ export type Database = {
           admin_note?: string | null
           amount_requested?: number
           applicant_name?: string
+          cgpa?: number | null
           course_of_study?: string
           created_at?: string
           id?: string
@@ -179,8 +244,45 @@ export type Database = {
           level?: string
           reason?: string | null
           scholarship_name?: string
+          school_year?: string | null
           status?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string | null
+          created_at: string
+          description: string
+          id: string
+          reference: string | null
+          status: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          reference?: string | null
+          status?: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          reference?: string | null
+          status?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
