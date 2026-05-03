@@ -421,6 +421,25 @@ const EducationDashboard = () => {
                 onChange={(e) => setNewDep((p) => ({ ...p, goal: e.target.value }))}
                 className="bg-secondary/50 border-border/50"
               />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-xs">CGPA</Label>
+                <Input type="number" step="0.01" placeholder="e.g. 4.25" value={newDep.cgpa}
+                  onChange={(e) => setNewDep((p) => ({ ...p, cgpa: e.target.value }))}
+                  className="bg-secondary/50 border-border/50" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">School Year</Label>
+                <Input placeholder="e.g. 200 Level / SS2" value={newDep.schoolYear}
+                  onChange={(e) => setNewDep((p) => ({ ...p, schoolYear: e.target.value }))}
+                  className="bg-secondary/50 border-border/50" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">Reason for Funding *</Label>
+              <Textarea placeholder="Why are you applying for this fund?" value={newDep.reason}
+                onChange={(e) => setNewDep((p) => ({ ...p, reason: e.target.value }))}
+                className="bg-secondary/50 border-border/50 min-h-[70px]" />
             </div>
           </div>
           <DialogFooter className="gap-2">
