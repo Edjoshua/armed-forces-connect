@@ -54,9 +54,9 @@ const EducationDashboard = () => {
   const [showScholarshipDialog, setShowScholarshipDialog] = useState(false);
   const [selectedScholarship, setSelectedScholarship] = useState<typeof NIGERIAN_SCHOLARSHIPS[number] | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "" });
+  const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "", cgpa: "", schoolYear: "", reason: "" });
   const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30" });
-  const [newApplication, setNewApplication] = useState({ applicantName: "", institution: "", course: "", level: "undergraduate", amount: "", reason: "" });
+  const [newApplication, setNewApplication] = useState({ applicantName: "", institution: "", course: "", level: "undergraduate", amount: "", reason: "", cgpa: "", schoolYear: "" });
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -493,124 +493,7 @@ const EducationDashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Crowdfunding Section — GoFundMe style */}
-      <Card className="border-border/50 bg-card/80 overflow-hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                <HeartPulse className="h-4 w-4 text-destructive" /> Medical Crowdfunding
-              </CardTitle>
-              <p className="text-xs text-muted-foreground mt-1">Help fellow servicemen and their families cover urgent medical costs</p>
-            </div>
-            <Button variant="gold" size="sm" onClick={() => setShowCampaignDialog(true)}>
-              <PlusCircle className="h-3.5 w-3.5" /> Start Fundraiser
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {campaigns.length === 0 && (
-            <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
-              <Stethoscope className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-              <p className="text-sm font-medium text-muted-foreground">No active medical fundraisers yet</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start a fundraiser — every contribution helps save lives.</p>
-            </div>
-          )}
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {campaigns.map((c) => {
-              const isOwner = user?.id === c.user_id;
-              const isPending = c.status === "pending";
-              const goal = Number(c.goal) || 1;
-              const raised = Number(c.raised) || 0;
-              const progress = Math.min(100, (raised / goal) * 100);
-              return (
-                <div key={c.id} className="rounded-xl border border-border/40 bg-secondary/20 overflow-hidden flex flex-col hover:border-primary/30 transition-colors">
-                  {/* Hero strip */}
-                  <div className="relative h-24 bg-gradient-to-br from-destructive/30 via-destructive/20 to-primary/10 flex items-center justify-center">
-                    <HeartPulse className="h-10 w-10 text-destructive/80" />
-                    <div className="absolute top-2 right-2 flex flex-wrap gap-1 justify-end">
-                      {isOwner && isPending && (
-                        <Badge variant="outline" className="text-[10px] bg-warning/90 text-warning-foreground border-warning/40 backdrop-blur">
-                          <Clock className="h-3 w-3 mr-1" /> Pending
-                        </Badge>
-                      )}
-                      {isOwner && !isPending && (
-                        <Badge variant="outline" className="text-[10px] bg-primary/90 text-primary-foreground border-primary/40 backdrop-blur">My Campaign</Badge>
-                      )}
-                    </div>
-                    <div className="absolute bottom-2 left-2">
-                      <Badge variant="outline" className="text-[10px] bg-background/70 border-border/50 backdrop-blur">
-                        <CalendarDays className="h-3 w-3 mr-1" /> {c.days_left} days left
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="p-4 flex-1 flex flex-col">
-                    <p className="text-sm font-semibold text-foreground line-clamp-2">{c.name}</p>
-                    {c.description && (
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-3">{c.description}</p>
-                    )}
-
-                    {isOwner && isPending && (
-                      <div className="flex items-start gap-2 p-2 mt-3 rounded-md bg-warning/5 border border-warning/15">
-                        <Clock className="h-3.5 w-3.5 text-warning mt-0.5 shrink-0" />
-                        <p className="text-[11px] text-warning">
-                          Awaiting admin approval. Your campaign will go live once verified.
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="mt-3 space-y-1">
-                      <Progress value={progress} className="h-2" />
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-mono font-semibold text-foreground">₦{raised.toLocaleString()}</span>
-                        <span className="text-muted-foreground">of ₦{goal.toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-2">
-                      <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {c.backers} backers</span>
-                      <span className="flex items-center gap-1"><Target className="h-3 w-3" /> {Math.round(progress)}% funded</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-4">
-                      {isOwner ? (
-                        <Button variant="destructive" size="sm" className="text-xs flex-1" onClick={() => handleWithdrawCampaign(c.id, c.name)}>
-                          <Trash2 className="h-3 w-3" /> Withdraw
-                        </Button>
-                      ) : (
-                        <>
-                          <Button variant="gold" size="sm" className="text-xs flex-1" onClick={() => handleDonate(c.name)} disabled={isPending}>
-                            <Heart className="h-3 w-3" /> Donate
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-xs" onClick={() => handleShare(c.name)}>
-                            <Share2 className="h-3 w-3" /> Share
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {campaigns.some((c) => c.status === "active" && c.user_id !== user?.id) && (
-            <div className="rounded-lg border border-border/40 bg-secondary/30 p-3 space-y-2">
-              <Label className="text-xs flex items-center gap-1"><Sparkles className="h-3 w-3 text-primary" /> Quick donation amount (₦)</Label>
-              <Input
-                type="number"
-                placeholder="Enter amount before tapping Donate"
-                value={crowdfundAmount}
-                onChange={(e) => setCrowdfundAmount(e.target.value)}
-                className="bg-background border-border/50"
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
+      {/* Medical crowdfunding removed — replaced by Transaction History route */}
       {/* Nigerian Scholarships Section */}
       <Card className="border-border/50 bg-card/80">
         <CardHeader className="pb-3">
