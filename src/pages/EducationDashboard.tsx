@@ -678,6 +678,7 @@ const EducationDashboard = () => {
               </div>
             </div>
             <div className="space-y-2">
+              <Label className="text-xs">Reason for Application *</Label>
               <Textarea
                 placeholder="Briefly explain why you qualify and need this scholarship"
                 value={newApplication.reason}
