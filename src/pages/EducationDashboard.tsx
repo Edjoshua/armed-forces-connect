@@ -663,8 +663,21 @@ const EducationDashboard = () => {
                 />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-xs">CGPA</Label>
+                <Input type="number" step="0.01" placeholder="e.g. 4.25" value={newApplication.cgpa}
+                  onChange={(e) => setNewApplication((p) => ({ ...p, cgpa: e.target.value }))}
+                  className="bg-secondary/50 border-border/50" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">School Year</Label>
+                <Input placeholder="e.g. 300 Level" value={newApplication.schoolYear}
+                  onChange={(e) => setNewApplication((p) => ({ ...p, schoolYear: e.target.value }))}
+                  className="bg-secondary/50 border-border/50" />
+              </div>
+            </div>
             <div className="space-y-2">
-              <Label className="text-xs">Reason for Application</Label>
               <Textarea
                 placeholder="Briefly explain why you qualify and need this scholarship"
                 value={newApplication.reason}
