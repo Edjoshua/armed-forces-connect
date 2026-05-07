@@ -19,14 +19,17 @@ export type Database = {
           approved_at: string | null
           backers: number
           beneficiary: string | null
+          category: string
           cgpa: number | null
           created_at: string
           days_left: number
           description: string | null
+          documentation_path: string | null
           goal: number
           id: string
           name: string
           raised: number
+          reason: string | null
           school_year: string | null
           status: string
           updated_at: string
@@ -36,14 +39,17 @@ export type Database = {
           approved_at?: string | null
           backers?: number
           beneficiary?: string | null
+          category?: string
           cgpa?: number | null
           created_at?: string
           days_left?: number
           description?: string | null
+          documentation_path?: string | null
           goal?: number
           id?: string
           name: string
           raised?: number
+          reason?: string | null
           school_year?: string | null
           status?: string
           updated_at?: string
@@ -53,14 +59,17 @@ export type Database = {
           approved_at?: string | null
           backers?: number
           beneficiary?: string | null
+          category?: string
           cgpa?: number | null
           created_at?: string
           days_left?: number
           description?: string | null
+          documentation_path?: string | null
           goal?: number
           id?: string
           name?: string
           raised?: number
+          reason?: string | null
           school_year?: string | null
           status?: string
           updated_at?: string
