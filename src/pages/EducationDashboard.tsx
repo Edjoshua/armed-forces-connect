@@ -486,8 +486,8 @@ const EducationDashboard = () => {
               <Heart className="h-5 w-5 text-destructive" /> Start Medical Fundraiser
             </DialogTitle>
           </DialogHeader>
-          <p className="text-xs text-muted-foreground -mt-2">Create a fundraiser to cover medical treatment, surgery, or recovery costs.</p>
-          <div className="space-y-4 py-2">
+          <p className="text-xs text-muted-foreground -mt-2">Create a fundraiser to cover medical treatment, surgery, or recovery costs. Reason and medical documentation are required for verification.</p>
+          <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto">
             <div className="space-y-2">
               <Label className="text-xs">Campaign Name *</Label>
               <Input
@@ -498,37 +498,61 @@ const EducationDashboard = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Description</Label>
+              <Label className="text-xs">Reason for Fundraiser *</Label>
               <Textarea
-                placeholder="Briefly describe the medical condition, treatment needed, and how funds will be used"
-                value={newCampaign.description}
-                onChange={(e) => setNewCampaign((p) => ({ ...p, description: e.target.value }))}
+                placeholder="Explain the patient's medical condition, diagnosis, and treatment plan"
+                value={newCampaign.reason}
+                onChange={(e) => setNewCampaign((p) => ({ ...p, reason: e.target.value }))}
                 className="bg-secondary/50 border-border/50 min-h-[80px]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Fundraising Goal (₦)</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 2000000"
-                value={newCampaign.goal}
-                onChange={(e) => setNewCampaign((p) => ({ ...p, goal: e.target.value }))}
-                className="bg-secondary/50 border-border/50"
+              <Label className="text-xs">Story / Description</Label>
+              <Textarea
+                placeholder="Share more about the family, hospital, and how funds will be used"
+                value={newCampaign.description}
+                onChange={(e) => setNewCampaign((p) => ({ ...p, description: e.target.value }))}
+                className="bg-secondary/50 border-border/50 min-h-[70px]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Campaign Duration (days)</Label>
-              <Select value={newCampaign.daysLeft} onValueChange={(v) => setNewCampaign((p) => ({ ...p, daysLeft: v }))}>
-                <SelectTrigger className="bg-secondary/50 border-border/50">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="15">15 days</SelectItem>
-                  <SelectItem value="30">30 days</SelectItem>
-                  <SelectItem value="45">45 days</SelectItem>
-                  <SelectItem value="60">60 days</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label className="text-xs">Medical Documentation *</Label>
+              <Input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={(e) => setMedicalDoc(e.target.files?.[0] || null)}
+                className="bg-secondary/50 border-border/50 file:text-foreground"
+              />
+              <p className="text-[10px] text-muted-foreground">Upload hospital report, prescription, or referral letter (PDF / image). Securely stored, only visible to admin reviewers.</p>
+              {medicalDoc && (
+                <p className="text-[11px] text-success flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> {medicalDoc.name}</p>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-xs">Goal (₦)</Label>
+                <Input
+                  type="number"
+                  placeholder="2000000"
+                  value={newCampaign.goal}
+                  onChange={(e) => setNewCampaign((p) => ({ ...p, goal: e.target.value }))}
+                  className="bg-secondary/50 border-border/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">Duration</Label>
+                <Select value={newCampaign.daysLeft} onValueChange={(v) => setNewCampaign((p) => ({ ...p, daysLeft: v }))}>
+                  <SelectTrigger className="bg-secondary/50 border-border/50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="15">15 days</SelectItem>
+                    <SelectItem value="30">30 days</SelectItem>
+                    <SelectItem value="45">45 days</SelectItem>
+                    <SelectItem value="60">60 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-2">
