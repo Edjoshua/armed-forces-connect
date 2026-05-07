@@ -55,6 +55,7 @@ const App = () => (
               <Route path="support" element={<SupportDashboard />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="transactions" element={<TransactionHistory />} />
+              <Route path="medical" element={<MedicalCrowdfunding />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
