@@ -55,7 +55,8 @@ const EducationDashboard = () => {
   const [selectedScholarship, setSelectedScholarship] = useState<typeof NIGERIAN_SCHOLARSHIPS[number] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "", cgpa: "", schoolYear: "", reason: "" });
-  const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30" });
+  const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30", reason: "" });
+  const [medicalDoc, setMedicalDoc] = useState<File | null>(null);
   const [newApplication, setNewApplication] = useState({ applicantName: "", institution: "", course: "", level: "undergraduate", amount: "", reason: "", cgpa: "", schoolYear: "" });
   const { toast } = useToast();
   const { user } = useAuth();
@@ -216,20 +217,43 @@ const EducationDashboard = () => {
       toast({ title: "Missing info", description: "Please enter a campaign name", variant: "destructive" });
       return;
     }
+    if (!newCampaign.reason.trim()) {
+      toast({ title: "Reason required", description: "Please provide the medical reason for this fundraiser.", variant: "destructive" });
+      return;
+    }
+    if (!medicalDoc) {
+      toast({ title: "Documentation required", description: "Please upload medical documentation for verification.", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
+
+    // Upload medical documentation to private bucket
+    const ext = medicalDoc.name.split(".").pop() || "pdf";
+    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("medical-docs").upload(path, medicalDoc, { upsert: false });
+    if (upErr) {
+      toast({ title: "Upload failed", description: upErr.message, variant: "destructive" });
+      setSubmitting(false);
+      return;
+    }
+
     const { error } = await supabase.from("crowdfund_campaigns").insert({
       user_id: user.id,
       name: newCampaign.name.trim(),
       description: newCampaign.description.trim() || null,
+      reason: newCampaign.reason.trim(),
+      documentation_path: path,
+      category: "medical",
       goal: Number(newCampaign.goal) || 500000,
       days_left: Number(newCampaign.daysLeft) || 30,
     });
     if (error) {
       toast({ title: "Error", description: "Failed to create campaign. Please try again.", variant: "destructive" });
     } else {
-      setNewCampaign({ name: "", description: "", goal: "", daysLeft: "30" });
+      setNewCampaign({ name: "", description: "", goal: "", daysLeft: "30", reason: "" });
+      setMedicalDoc(null);
       setShowCampaignDialog(false);
-      toast({ title: "Campaign Submitted", description: "Your campaign has been submitted for admin approval. It will go live once approved." });
+      toast({ title: "Campaign Submitted", description: "Your medical fundraiser has been submitted with documentation for admin verification." });
       fetchCampaigns();
     }
     setSubmitting(false);
@@ -462,8 +486,8 @@ const EducationDashboard = () => {
               <Heart className="h-5 w-5 text-destructive" /> Start Medical Fundraiser
             </DialogTitle>
           </DialogHeader>
-          <p className="text-xs text-muted-foreground -mt-2">Create a fundraiser to cover medical treatment, surgery, or recovery costs.</p>
-          <div className="space-y-4 py-2">
+          <p className="text-xs text-muted-foreground -mt-2">Create a fundraiser to cover medical treatment, surgery, or recovery costs. Reason and medical documentation are required for verification.</p>
+          <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto">
             <div className="space-y-2">
               <Label className="text-xs">Campaign Name *</Label>
               <Input
@@ -474,37 +498,61 @@ const EducationDashboard = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Description</Label>
+              <Label className="text-xs">Reason for Fundraiser *</Label>
               <Textarea
-                placeholder="Briefly describe the medical condition, treatment needed, and how funds will be used"
-                value={newCampaign.description}
-                onChange={(e) => setNewCampaign((p) => ({ ...p, description: e.target.value }))}
+                placeholder="Explain the patient's medical condition, diagnosis, and treatment plan"
+                value={newCampaign.reason}
+                onChange={(e) => setNewCampaign((p) => ({ ...p, reason: e.target.value }))}
                 className="bg-secondary/50 border-border/50 min-h-[80px]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Fundraising Goal (₦)</Label>
-              <Input
-                type="number"
-                placeholder="e.g. 2000000"
-                value={newCampaign.goal}
-                onChange={(e) => setNewCampaign((p) => ({ ...p, goal: e.target.value }))}
-                className="bg-secondary/50 border-border/50"
+              <Label className="text-xs">Story / Description</Label>
+              <Textarea
+                placeholder="Share more about the family, hospital, and how funds will be used"
+                value={newCampaign.description}
+                onChange={(e) => setNewCampaign((p) => ({ ...p, description: e.target.value }))}
+                className="bg-secondary/50 border-border/50 min-h-[70px]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Campaign Duration (days)</Label>
-              <Select value={newCampaign.daysLeft} onValueChange={(v) => setNewCampaign((p) => ({ ...p, daysLeft: v }))}>
-                <SelectTrigger className="bg-secondary/50 border-border/50">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="15">15 days</SelectItem>
-                  <SelectItem value="30">30 days</SelectItem>
-                  <SelectItem value="45">45 days</SelectItem>
-                  <SelectItem value="60">60 days</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label className="text-xs">Medical Documentation *</Label>
+              <Input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={(e) => setMedicalDoc(e.target.files?.[0] || null)}
+                className="bg-secondary/50 border-border/50 file:text-foreground"
+              />
+              <p className="text-[10px] text-muted-foreground">Upload hospital report, prescription, or referral letter (PDF / image). Securely stored, only visible to admin reviewers.</p>
+              {medicalDoc && (
+                <p className="text-[11px] text-success flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> {medicalDoc.name}</p>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-xs">Goal (₦)</Label>
+                <Input
+                  type="number"
+                  placeholder="2000000"
+                  value={newCampaign.goal}
+                  onChange={(e) => setNewCampaign((p) => ({ ...p, goal: e.target.value }))}
+                  className="bg-secondary/50 border-border/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">Duration</Label>
+                <Select value={newCampaign.daysLeft} onValueChange={(v) => setNewCampaign((p) => ({ ...p, daysLeft: v }))}>
+                  <SelectTrigger className="bg-secondary/50 border-border/50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="15">15 days</SelectItem>
+                    <SelectItem value="30">30 days</SelectItem>
+                    <SelectItem value="45">45 days</SelectItem>
+                    <SelectItem value="60">60 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-2">
@@ -518,7 +566,92 @@ const EducationDashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Medical crowdfunding removed — replaced by Transaction History route */}
+      {/* Medical Crowdfunding (GoFundMe-style) */}
+      <Card className="border-border/50 bg-card/80">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <CardTitle className="text-base flex items-center gap-2">
+              <HeartPulse className="h-4 w-4 text-destructive" /> Medical Crowdfunding
+            </CardTitle>
+            <Button variant="gold" size="sm" onClick={() => setShowCampaignDialog(true)}>
+              <PlusCircle className="h-3.5 w-3.5" /> Start Fundraiser
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Help fellow servicemen and their families cover urgent medical costs. Every fundraiser must include a reason and medical documentation, and is verified by an admin before going live.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {campaigns.length === 0 && (
+            <div className="text-center py-8 rounded-lg border border-dashed border-border/50">
+              <Stethoscope className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm font-medium text-muted-foreground">No active medical fundraisers</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">Be the first to start one for a serviceman in need</p>
+            </div>
+          )}
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {campaigns.map((c) => {
+              const isOwner = c.user_id === user?.id;
+              const goal = Number(c.goal) || 1;
+              const raised = Number(c.raised) || 0;
+              const pct = Math.min(100, Math.round((raised / goal) * 100));
+              const StatusIcon = statusIcons[c.status] || Clock;
+              return (
+                <div key={c.id} className="rounded-xl border border-border/40 bg-secondary/30 overflow-hidden flex flex-col">
+                  <div className="h-24 bg-gradient-to-br from-destructive/30 via-destructive/10 to-primary/20 flex items-center justify-center relative">
+                    <HeartPulse className="h-10 w-10 text-destructive/80" />
+                    <Badge variant="outline" className={`absolute top-2 right-2 text-[10px] ${statusStyle[c.status] || "border-border/50"}`}>
+                      <StatusIcon className="h-3 w-3 mr-1" />
+                      {c.status === "pending" ? "Pending Review" : c.status === "active" ? "Live" : c.status}
+                    </Badge>
+                  </div>
+                  <div className="p-4 flex-1 flex flex-col gap-2">
+                    <p className="text-sm font-semibold text-foreground leading-tight">{c.name}</p>
+                    {c.reason && (
+                      <p className="text-[11px] text-muted-foreground line-clamp-2"><span className="text-foreground/80 font-medium">Reason:</span> {c.reason}</p>
+                    )}
+                    {c.description && (
+                      <p className="text-[11px] text-muted-foreground line-clamp-2">{c.description}</p>
+                    )}
+                    <div className="mt-auto pt-2 space-y-2">
+                      <Progress value={pct} className="h-1.5" />
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-mono text-foreground">₦{raised.toLocaleString()} <span className="text-muted-foreground">of ₦{goal.toLocaleString()}</span></span>
+                        <span className="text-muted-foreground">{pct}% · {c.backers || 0} backers</span>
+                      </div>
+                      {c.status === "pending" && isOwner && (
+                        <div className="flex items-start gap-2 p-2 rounded-md bg-warning/5 border border-warning/15">
+                          <Clock className="h-3 w-3 text-warning mt-0.5 shrink-0" />
+                          <p className="text-[10px] text-warning">Awaiting admin verification of your medical documentation.</p>
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        {isOwner ? (
+                          <Button variant="destructive" size="sm" className="text-xs flex-1" onClick={() => handleWithdrawCampaign(c.id, c.name)}>
+                            <Trash2 className="h-3 w-3" /> Withdraw
+                          </Button>
+                        ) : (
+                          <>
+                            <Button variant="gold" size="sm" className="text-xs flex-1" onClick={() => handleDonate(c.name)}>
+                              <Heart className="h-3 w-3" /> Donate
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-xs" onClick={() => handleShare(c.name)}>
+                              <Share2 className="h-3 w-3" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+
       {/* Nigerian Scholarships Section */}
       <Card className="border-border/50 bg-card/80">
         <CardHeader className="pb-3">
