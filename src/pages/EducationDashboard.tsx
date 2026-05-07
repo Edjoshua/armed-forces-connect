@@ -55,7 +55,8 @@ const EducationDashboard = () => {
   const [selectedScholarship, setSelectedScholarship] = useState<typeof NIGERIAN_SCHOLARSHIPS[number] | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [newDep, setNewDep] = useState({ name: "", relationship: "Son", dateOfBirth: "", school: "", goal: "", cgpa: "", schoolYear: "", reason: "" });
-  const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30" });
+  const [newCampaign, setNewCampaign] = useState({ name: "", description: "", goal: "", daysLeft: "30", reason: "" });
+  const [medicalDoc, setMedicalDoc] = useState<File | null>(null);
   const [newApplication, setNewApplication] = useState({ applicantName: "", institution: "", course: "", level: "undergraduate", amount: "", reason: "", cgpa: "", schoolYear: "" });
   const { toast } = useToast();
   const { user } = useAuth();
