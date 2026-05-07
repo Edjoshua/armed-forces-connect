@@ -217,20 +217,43 @@ const EducationDashboard = () => {
       toast({ title: "Missing info", description: "Please enter a campaign name", variant: "destructive" });
       return;
     }
+    if (!newCampaign.reason.trim()) {
+      toast({ title: "Reason required", description: "Please provide the medical reason for this fundraiser.", variant: "destructive" });
+      return;
+    }
+    if (!medicalDoc) {
+      toast({ title: "Documentation required", description: "Please upload medical documentation for verification.", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
+
+    // Upload medical documentation to private bucket
+    const ext = medicalDoc.name.split(".").pop() || "pdf";
+    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("medical-docs").upload(path, medicalDoc, { upsert: false });
+    if (upErr) {
+      toast({ title: "Upload failed", description: upErr.message, variant: "destructive" });
+      setSubmitting(false);
+      return;
+    }
+
     const { error } = await supabase.from("crowdfund_campaigns").insert({
       user_id: user.id,
       name: newCampaign.name.trim(),
       description: newCampaign.description.trim() || null,
+      reason: newCampaign.reason.trim(),
+      documentation_path: path,
+      category: "medical",
       goal: Number(newCampaign.goal) || 500000,
       days_left: Number(newCampaign.daysLeft) || 30,
     });
     if (error) {
       toast({ title: "Error", description: "Failed to create campaign. Please try again.", variant: "destructive" });
     } else {
-      setNewCampaign({ name: "", description: "", goal: "", daysLeft: "30" });
+      setNewCampaign({ name: "", description: "", goal: "", daysLeft: "30", reason: "" });
+      setMedicalDoc(null);
       setShowCampaignDialog(false);
-      toast({ title: "Campaign Submitted", description: "Your campaign has been submitted for admin approval. It will go live once approved." });
+      toast({ title: "Campaign Submitted", description: "Your medical fundraiser has been submitted with documentation for admin verification." });
       fetchCampaigns();
     }
     setSubmitting(false);
