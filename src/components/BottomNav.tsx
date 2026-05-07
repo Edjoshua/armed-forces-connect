@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { CreditCard, GraduationCap, ShoppingBag, Receipt, Wallet } from "lucide-react";
+import { CreditCard, GraduationCap, ShoppingBag, HeartPulse, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -7,7 +7,7 @@ const navItems = [
   { label: "Payments", icon: CreditCard, path: "/dashboard/payments", badge: 2 },
   { label: "Education", icon: GraduationCap, path: "/dashboard/education", badge: 1 },
   { label: "Retail", icon: ShoppingBag, path: "/dashboard/retail", badge: 3 },
-  { label: "History", icon: Receipt, path: "/dashboard/transactions", badge: 0 },
+  { label: "Medical", icon: HeartPulse, path: "/dashboard/medical", badge: 0 },
 ];
 
 const BottomNav = () => {
