@@ -14,6 +14,7 @@ import SettingsDashboard from "./pages/SettingsDashboard";
 import SupportDashboard from "./pages/SupportDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import TransactionHistory from "./pages/TransactionHistory";
+import MedicalCrowdfunding from "./pages/MedicalCrowdfunding";
 import ApprovedFundings from "./pages/ApprovedFundings";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="support" element={<SupportDashboard />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="transactions" element={<TransactionHistory />} />
+              <Route path="medical" element={<MedicalCrowdfunding />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, HeadphonesIcon, Settings, User, Bell, HandCoins } from "lucide-react";
+import { LogOut, HeadphonesIcon, Settings, User, Bell, HandCoins, Receipt } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,7 @@ import militaryCrest from "@/assets/nigerian-military-crest.png";
 
 const profileMenuItems = [
   { label: "My Profile", icon: User, path: "/dashboard/profile", badge: 0 },
+  { label: "Transaction History", icon: Receipt, path: "/dashboard/transactions", badge: 0 },
   { label: "Approved Fundings", icon: HandCoins, path: "/dashboard/approved-fundings", badge: 0 },
   { label: "Support", icon: HeadphonesIcon, path: "/dashboard/support", badge: 2 },
   { label: "Settings", icon: Settings, path: "/dashboard/settings", badge: 0 },
