@@ -388,14 +388,14 @@ const EducationDashboard = () => {
 
       {/* Add Dependent Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col gap-0 p-0">
+          <DialogHeader className="p-6 pb-2 flex-shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="h-5 w-5 text-primary" /> Add Dependent
             </DialogTitle>
+            <p className="text-xs text-muted-foreground">Your dependent will be submitted for admin verification before being activated.</p>
           </DialogHeader>
-          <p className="text-xs text-muted-foreground -mt-2">Your dependent will be submitted for admin verification before being activated.</p>
-          <div className="space-y-4 py-2">
+          <div className="flex-1 min-h-0 overflow-y-auto px-6 py-2 space-y-4">
             <div className="space-y-2">
               <Label className="text-xs">Full Name *</Label>
               <Input
@@ -467,7 +467,7 @@ const EducationDashboard = () => {
                 className="bg-secondary/50 border-border/50 min-h-[70px]" />
             </div>
           </div>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 p-6 pt-3 flex-shrink-0 border-t border-border/50">
             <DialogClose asChild>
               <Button variant="ghost" size="sm">Cancel</Button>
             </DialogClose>
