@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      crowdfund_campaign_audit: {
+        Row: {
+          campaign_id: string
+          campaign_user_id: string
+          changed_by: string | null
+          created_at: string
+          field: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+        }
+        Insert: {
+          campaign_id: string
+          campaign_user_id: string
+          changed_by?: string | null
+          created_at?: string
+          field: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          campaign_user_id?: string
+          changed_by?: string | null
+          created_at?: string
+          field?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+        }
+        Relationships: []
+      }
       crowdfund_campaigns: {
         Row: {
           approved_at: string | null
