@@ -41,6 +41,7 @@ const NIGERIAN_SCHOLARSHIPS = [
   { name: "Nigerian Army Education Trust", provider: "Nigerian Army", amount: 500000, level: "All Levels", deadline: "Open" },
   { name: "MTN Foundation Scholarship", provider: "MTN Foundation", amount: 200000, level: "Undergraduate", deadline: "Q3" },
   { name: "Agbami Medical & Engineering Scholarship", provider: "Agbami Partners", amount: 400000, level: "Undergraduate", deadline: "Q1" },
+  { name: "TETFund Scholarship Scheme", provider: "Tertiary Education Trust Fund", amount: 1500000, level: "Postgraduate", deadline: "Annual" },
 ];
 
 const EducationDashboard = () => {
