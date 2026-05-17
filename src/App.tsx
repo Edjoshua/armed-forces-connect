@@ -16,6 +16,7 @@ import ProfilePage from "./pages/ProfilePage";
 import TransactionHistory from "./pages/TransactionHistory";
 import MedicalCrowdfunding from "./pages/MedicalCrowdfunding";
 import ApprovedFundings from "./pages/ApprovedFundings";
+import ProductionSmoke from "./pages/ProductionSmoke";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
