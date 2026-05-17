@@ -57,6 +57,7 @@ const App = () => (
               <Route path="profile" element={<ProfilePage />} />
               <Route path="transactions" element={<TransactionHistory />} />
               <Route path="medical" element={<MedicalCrowdfunding />} />
+              <Route path="production-smoke" element={<ProductionSmoke />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
