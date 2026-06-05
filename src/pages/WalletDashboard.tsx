@@ -81,6 +81,93 @@ const WalletDashboard = () => {
     toast.success("Account number copied");
   };
 
+  // Deposit tracking with realtime updates
+  type Deposit = {
+    id: string;
+    amount: number;
+    reference: string | null;
+    source: string | null;
+    status: "pending" | "confirmed" | "failed";
+    failure_reason: string | null;
+    created_at: string;
+    confirmed_at: string | null;
+  };
+  const [deposits, setDeposits] = useState<Deposit[]>([]);
+  const [simulating, setSimulating] = useState(false);
+
+  const fetchDeposits = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("deposits")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5);
+    if (data) setDeposits(data as Deposit[]);
+  }, [user]);
+
+  useEffect(() => { fetchDeposits(); }, [fetchDeposits]);
+
+  // Realtime: notify when deposits change status
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`deposits-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "deposits", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const newRow = payload.new as Deposit | undefined;
+          const oldRow = payload.old as Deposit | undefined;
+          if (payload.eventType === "UPDATE" && newRow && oldRow && newRow.status !== oldRow.status) {
+            if (newRow.status === "confirmed") {
+              toast.success(`Top-up credited: ₦${Number(newRow.amount).toLocaleString()}`, {
+                description: newRow.reference ? `Ref ${newRow.reference}` : undefined,
+              });
+            } else if (newRow.status === "failed") {
+              toast.error(`Deposit failed: ₦${Number(newRow.amount).toLocaleString()}`, {
+                description: newRow.failure_reason || "Please try again",
+              });
+            }
+          }
+          fetchDeposits();
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchDeposits]);
+
+  // Demo: simulate an incoming bank transfer top-up
+  const simulateTopUp = async () => {
+    if (!user || simulating) return;
+    setSimulating(true);
+    const amount = 25000 + Math.floor(Math.random() * 75000);
+    const reference = `DEP-${Date.now().toString().slice(-8)}`;
+    const { data, error } = await supabase
+      .from("deposits")
+      .insert({ user_id: user.id, amount, reference, source: "Bank Transfer", status: "pending" })
+      .select()
+      .single();
+    setSimulating(false);
+    if (error || !data) {
+      toast.error("Could not start deposit");
+      return;
+    }
+    toast("Deposit pending", { description: `₦${amount.toLocaleString()} · awaiting confirmation` });
+    // Simulate bank confirmation after a short delay
+    setTimeout(async () => {
+      const willFail = Math.random() < 0.15;
+      await supabase
+        .from("deposits")
+        .update(
+          willFail
+            ? { status: "failed", failure_reason: "Bank declined transfer" }
+            : { status: "confirmed", confirmed_at: new Date().toISOString() }
+        )
+        .eq("id", data.id);
+    }, 3500);
+  };
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     fetchProfile();
