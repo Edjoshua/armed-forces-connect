@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, TrendingUp, Eye, EyeOff, QrCode, Smartphone, Send, Shield, RefreshCw } from "lucide-react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, TrendingUp, Eye, EyeOff, QrCode, Smartphone, Send, Shield, RefreshCw, Copy, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,6 +66,20 @@ const WalletDashboard = () => {
   }, [user]);
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  // Generate a stable 10-digit virtual account number from user id
+  const accountNumber = useMemo(() => {
+    const seed = user?.id || "00000000";
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+    const num = (3000000000 + (hash % 1000000000)).toString().padStart(10, "0");
+    return num.slice(0, 10);
+  }, [user?.id]);
+
+  const copyAccount = () => {
+    navigator.clipboard.writeText(accountNumber);
+    toast.success("Account number copied");
+  };
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -178,6 +192,25 @@ const WalletDashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Card className="border-accent/30 bg-gradient-to-r from-accent/10 via-card to-primary/5">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="rounded-lg bg-primary/10 p-2.5 shrink-0">
+              <Building2 className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Fund your wallet · MWCIP Bank</p>
+              <div className="flex items-center gap-2">
+                <p className="text-base sm:text-lg font-mono font-bold text-foreground tracking-wider truncate">{accountNumber}</p>
+                <button onClick={copyAccount} className="text-primary hover:text-primary/80 transition-colors shrink-0" aria-label="Copy account number">
+                  <Copy className="h-4 w-4" />
+                </button>
+              </div>
+              <p className="text-[11px] text-muted-foreground truncate">{userName} · Transfer from any bank to top up</p>
+            </div>
+          </CardContent>
+        </Card>
+
 
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           <StatsCard icon={ArrowUpRight} title="Money In" value="₦485,000" change="This month" changeType="positive" />
