@@ -164,6 +164,45 @@ export type Database = {
         }
         Relationships: []
       }
+      deposits: {
+        Row: {
+          amount: number
+          confirmed_at: string | null
+          created_at: string
+          failure_reason: string | null
+          id: string
+          reference: string | null
+          source: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          confirmed_at?: string | null
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          reference?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          confirmed_at?: string | null
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          reference?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       kyc_verifications: {
         Row: {
           admin_note: string | null

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, TrendingUp, Eye, EyeOff, QrCode, Smartphone, Send, Shield, RefreshCw, Copy, Building2 } from "lucide-react";
+import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, TrendingUp, Eye, EyeOff, QrCode, Smartphone, Send, Shield, RefreshCw, Copy, Building2, Plus, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -79,6 +79,93 @@ const WalletDashboard = () => {
   const copyAccount = () => {
     navigator.clipboard.writeText(accountNumber);
     toast.success("Account number copied");
+  };
+
+  // Deposit tracking with realtime updates
+  type Deposit = {
+    id: string;
+    amount: number;
+    reference: string | null;
+    source: string | null;
+    status: "pending" | "confirmed" | "failed";
+    failure_reason: string | null;
+    created_at: string;
+    confirmed_at: string | null;
+  };
+  const [deposits, setDeposits] = useState<Deposit[]>([]);
+  const [simulating, setSimulating] = useState(false);
+
+  const fetchDeposits = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("deposits")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5);
+    if (data) setDeposits(data as Deposit[]);
+  }, [user]);
+
+  useEffect(() => { fetchDeposits(); }, [fetchDeposits]);
+
+  // Realtime: notify when deposits change status
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`deposits-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "deposits", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const newRow = payload.new as Deposit | undefined;
+          const oldRow = payload.old as Deposit | undefined;
+          if (payload.eventType === "UPDATE" && newRow && oldRow && newRow.status !== oldRow.status) {
+            if (newRow.status === "confirmed") {
+              toast.success(`Top-up credited: ₦${Number(newRow.amount).toLocaleString()}`, {
+                description: newRow.reference ? `Ref ${newRow.reference}` : undefined,
+              });
+            } else if (newRow.status === "failed") {
+              toast.error(`Deposit failed: ₦${Number(newRow.amount).toLocaleString()}`, {
+                description: newRow.failure_reason || "Please try again",
+              });
+            }
+          }
+          fetchDeposits();
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchDeposits]);
+
+  // Demo: simulate an incoming bank transfer top-up
+  const simulateTopUp = async () => {
+    if (!user || simulating) return;
+    setSimulating(true);
+    const amount = 25000 + Math.floor(Math.random() * 75000);
+    const reference = `DEP-${Date.now().toString().slice(-8)}`;
+    const { data, error } = await supabase
+      .from("deposits")
+      .insert({ user_id: user.id, amount, reference, source: "Bank Transfer", status: "pending" })
+      .select()
+      .single();
+    setSimulating(false);
+    if (error || !data) {
+      toast.error("Could not start deposit");
+      return;
+    }
+    toast("Deposit pending", { description: `₦${amount.toLocaleString()} · awaiting confirmation` });
+    // Simulate bank confirmation after a short delay
+    setTimeout(async () => {
+      const willFail = Math.random() < 0.15;
+      await supabase
+        .from("deposits")
+        .update(
+          willFail
+            ? { status: "failed", failure_reason: "Bank declined transfer" }
+            : { status: "confirmed", confirmed_at: new Date().toISOString() }
+        )
+        .eq("id", data.id);
+    }, 3500);
   };
 
   const handleRefresh = useCallback(async () => {
@@ -208,8 +295,60 @@ const WalletDashboard = () => {
               </div>
               <p className="text-[11px] text-muted-foreground truncate">{userName} · Transfer from any bank to top up</p>
             </div>
+            <Button variant="gold" size="sm" className="shrink-0 text-xs" onClick={simulateTopUp} disabled={simulating}>
+              <Plus className="h-3.5 w-3.5" /> {simulating ? "..." : "Top Up"}
+            </Button>
           </CardContent>
         </Card>
+
+        {deposits.length > 0 && (
+          <Card className="border-border/50 bg-card/80">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ArrowDownLeft className="h-4 w-4 text-primary" /> Deposit Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-0 divide-y divide-border/30">
+                {deposits.map((d) => {
+                  const statusMeta =
+                    d.status === "confirmed"
+                      ? { Icon: CheckCircle2, label: "Confirmed", cls: "text-success border-success/20 bg-success/5" }
+                      : d.status === "failed"
+                      ? { Icon: XCircle, label: "Failed", cls: "text-destructive border-destructive/20 bg-destructive/5" }
+                      : { Icon: Clock, label: "Pending", cls: "text-warning border-warning/20 bg-warning/5" };
+                  const { Icon } = statusMeta;
+                  return (
+                    <div key={d.id} className="flex items-center justify-between py-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={cn("rounded-full p-2 shrink-0 border", statusMeta.cls)}>
+                          <Icon className={cn("h-4 w-4", d.status === "pending" && "animate-pulse")} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {d.source || "Bank Transfer"} · ₦{Number(d.amount).toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {new Date(d.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            {d.reference ? ` · ${d.reference}` : ""}
+                          </p>
+                          {d.status === "failed" && d.failure_reason && (
+                            <p className="text-[11px] text-destructive truncate">{d.failure_reason}</p>
+                          )}
+                        </div>
+                      </div>
+                      <Badge variant="outline" className={cn("text-[10px] shrink-0 ml-2", statusMeta.cls)}>
+                        {statusMeta.label}
+                      </Badge>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+
 
 
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
