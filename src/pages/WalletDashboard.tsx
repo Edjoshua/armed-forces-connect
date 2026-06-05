@@ -193,6 +193,25 @@ const WalletDashboard = () => {
           </CardContent>
         </Card>
 
+        <Card className="border-accent/30 bg-gradient-to-r from-accent/10 via-card to-primary/5">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="rounded-lg bg-primary/10 p-2.5 shrink-0">
+              <Building2 className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Fund your wallet · MWCIP Bank</p>
+              <div className="flex items-center gap-2">
+                <p className="text-base sm:text-lg font-mono font-bold text-foreground tracking-wider truncate">{accountNumber}</p>
+                <button onClick={copyAccount} className="text-primary hover:text-primary/80 transition-colors shrink-0" aria-label="Copy account number">
+                  <Copy className="h-4 w-4" />
+                </button>
+              </div>
+              <p className="text-[11px] text-muted-foreground truncate">{userName} · Transfer from any bank to top up</p>
+            </div>
+          </CardContent>
+        </Card>
+
+
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           <StatsCard icon={ArrowUpRight} title="Money In" value="₦485,000" change="This month" changeType="positive" />
           <StatsCard icon={ArrowDownLeft} title="Money Out" value="₦145,700" change="This month" changeType="negative" />
