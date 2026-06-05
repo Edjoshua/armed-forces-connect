@@ -67,6 +67,20 @@ const WalletDashboard = () => {
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
+  // Generate a stable 10-digit virtual account number from user id
+  const accountNumber = useMemo(() => {
+    const seed = user?.id || "00000000";
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+    const num = (3000000000 + (hash % 1000000000)).toString().padStart(10, "0");
+    return num.slice(0, 10);
+  }, [user?.id]);
+
+  const copyAccount = () => {
+    navigator.clipboard.writeText(accountNumber);
+    toast.success("Account number copied");
+  };
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     fetchProfile();
