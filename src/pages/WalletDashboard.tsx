@@ -295,8 +295,60 @@ const WalletDashboard = () => {
               </div>
               <p className="text-[11px] text-muted-foreground truncate">{userName} · Transfer from any bank to top up</p>
             </div>
+            <Button variant="gold" size="sm" className="shrink-0 text-xs" onClick={simulateTopUp} disabled={simulating}>
+              <Plus className="h-3.5 w-3.5" /> {simulating ? "..." : "Top Up"}
+            </Button>
           </CardContent>
         </Card>
+
+        {deposits.length > 0 && (
+          <Card className="border-border/50 bg-card/80">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ArrowDownLeft className="h-4 w-4 text-primary" /> Deposit Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-0 divide-y divide-border/30">
+                {deposits.map((d) => {
+                  const statusMeta =
+                    d.status === "confirmed"
+                      ? { Icon: CheckCircle2, label: "Confirmed", cls: "text-success border-success/20 bg-success/5" }
+                      : d.status === "failed"
+                      ? { Icon: XCircle, label: "Failed", cls: "text-destructive border-destructive/20 bg-destructive/5" }
+                      : { Icon: Clock, label: "Pending", cls: "text-warning border-warning/20 bg-warning/5" };
+                  const { Icon } = statusMeta;
+                  return (
+                    <div key={d.id} className="flex items-center justify-between py-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={cn("rounded-full p-2 shrink-0 border", statusMeta.cls)}>
+                          <Icon className={cn("h-4 w-4", d.status === "pending" && "animate-pulse")} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {d.source || "Bank Transfer"} · ₦{Number(d.amount).toLocaleString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {new Date(d.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                            {d.reference ? ` · ${d.reference}` : ""}
+                          </p>
+                          {d.status === "failed" && d.failure_reason && (
+                            <p className="text-[11px] text-destructive truncate">{d.failure_reason}</p>
+                          )}
+                        </div>
+                      </div>
+                      <Badge variant="outline" className={cn("text-[10px] shrink-0 ml-2", statusMeta.cls)}>
+                        {statusMeta.label}
+                      </Badge>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+
 
 
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
